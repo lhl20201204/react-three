@@ -1,3 +1,5 @@
+import PromiseWrap from "../ProxyInstance/PromiseWrap"
+
 function getMidOrder(pre, suf) {
   const prel = pre.length
   const sufl = suf.length
@@ -31,11 +33,24 @@ export function getAst(pre, suf) {
     obj[v.name] = _.omit(v, ['name'])
     return obj
   }, {})
-  const transform = (a, level = 1) => ({
-    ...dict[a.name],
-    key: a.name,
-    level,
-    children: a.children.map(c => transform(c, level + 1))
-  })
+  const transform = (a, level = 1, parent = null) => {
+    const { current } = dict[a.name].value
+    if (current instanceof PromiseWrap) {
+      current.level = level;
+      if (parent instanceof PromiseWrap) {
+        current.parent = parent;
+      }
+      current.parentPromiseResolve(parent)
+      if (parent) {
+        parent.children.push?.(current)
+      }
+    }
+    return ({
+      ...dict[a.name],
+      key: a.name,
+      level,
+      children: a.children.map(c => transform(c, level + 1, current))
+    })
+  }
   return transform(ast)
 }

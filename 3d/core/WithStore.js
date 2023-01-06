@@ -2,6 +2,7 @@ import _ from "lodash"
 import React, { useEffect, useRef } from "react"
 import { getStore } from "./store"
 import { patch } from "./patch"
+import _constant from "../constant";
 const store = getStore();
 
 export function WithStore(Comp, option) {
@@ -11,7 +12,8 @@ export function WithStore(Comp, option) {
   return React.forwardRef((props, ref) => {
     const selfRef = useRef(null)
     const nameRef = useRef('')
-    const currentRef = ref || selfRef
+    const isFnRef = typeof ref === 'function'
+    const currentRef = ( isFnRef || !ref)  ? selfRef : ref
 
     if (option.name === 'World') {
       store.setIsInWorld(true)
@@ -24,7 +26,7 @@ export function WithStore(Comp, option) {
     }
 
     if (currentRef.current) {
-      currentRef.current?.updateProps?.(props)
+      currentRef.current?.updateProps?.(_.omit(props, _constant.propsOmit))
     }
 
     useEffect(() => {
@@ -33,7 +35,6 @@ export function WithStore(Comp, option) {
           type: option.name,
           name: nameRef.current,
           value: currentRef,
-          ref: currentRef,
         })
       }
 
@@ -45,7 +46,9 @@ export function WithStore(Comp, option) {
 
     })
 
-    return <Comp {..._.omit(props, ['children'])} ref={currentRef}>
+    return <Comp {..._.omit(props, ['children', _constant.funRef])} ref={currentRef} {
+      ...isFnRef ? {[_constant.funRef]: ref} : {}
+    }>
       {props.children}
     </Comp>;
   });

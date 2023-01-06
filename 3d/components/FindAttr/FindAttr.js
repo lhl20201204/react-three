@@ -2,12 +2,31 @@ import _ from "lodash";
 import React from "react";
 import _constant from "../../constant";
 import { WithStore } from "../../core";
-import useFindWrap from "../../Hook/useFindWrap";
+import { _render } from "../../core/render";
+import usePromiseWrap from "../../Hook/usePromiseWrap";
+import PrimitiveParent from "../../ProxyInstance/PrimitiveParent";
 
 const FindAttr = function (props, ref) {
-  useFindWrap({ 
+  usePromiseWrap(props, ref, {
     type: 'FindAttr',
-    attrType: _.get(props, _constant.findAttr)}, props, ref)
+    onParentLoad({resolve}, config) {
+      return (res) => {
+        const node = _.get(res, 'node', _.get(res, 'child'))
+        if (!_.has(props, 'cb')){
+          throw new Error(`必须传cb`)
+        }
+        const cb = props.cb
+        if (typeof cb !== 'function') {
+          throw new Error('cb 属性必须是函数')
+        }
+        const ret = cb(node, config)
+        if (!(ret instanceof PrimitiveParent)) {
+          throw new Error('返回值必须 instanceof PrimitiveParent')
+        }
+        resolve(ret)
+      }
+    }
+  })
   return props.children
 }
 

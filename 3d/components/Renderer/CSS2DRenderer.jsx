@@ -1,13 +1,15 @@
 import _ from "lodash";
-import React, { useRef } from "react";
-import * as THREE from 'three';
+import React from "react";
 import { WithStore } from "../../core";
-import useWrapNode from "../../Hook/useWrapNode";
-import { CSS2DRenderer as Css2dRender } from "three/examples/jsm/renderers/CSS2DRenderer"
+import { CSS2DRenderer as CSS2DRenderer2 } from "three/examples/jsm/renderers/CSS2DRenderer"
+import usePromiseWrap from "../../Hook/usePromiseWrap";
+import { getResolve } from "../../core/resolveValue";
 
 const CSS2DRenderer = function (props, ref) {
-  const instanceRef = useRef(new Css2dRender(_.get(props, 'parameters', undefined)))
-  useWrapNode(instanceRef.current, props, ref)
+  usePromiseWrap(props, ref, {
+    type: 'CSS2DRenderer',
+    f: getResolve(() => new CSS2DRenderer2(_.get(props, 'parameters', undefined)))
+  })
   return props.children
 }
 

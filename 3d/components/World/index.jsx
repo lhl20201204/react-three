@@ -1,13 +1,13 @@
 import _ from "lodash";
 import React, { useEffect } from "react";
-import * as THREE from 'three';
-import { getGlobal, WithStore } from "../../core";
+import { WithStore } from "../../core";
 import { Scene } from "../Scene";
-import { CSS2DRenderer, WebGLRenderer } from '../Renderer'
+import { CSS2DRenderer, CSS3DRenderer, WebGLRenderer } from '../Renderer'
 import { PerspectiveCamera } from "../Camera";
 import './index.less'
 import AmbientLight from "../Light/AmbientLight";
 import { getStore } from "../../core/store";
+
 const store = getStore()
 
 function World(props, ref) {
@@ -27,6 +27,7 @@ function World(props, ref) {
       <AmbientLight></AmbientLight>
       {props.children}
     </Scene>
+    <CSS3DRenderer />
     <WebGLRenderer />
     <CSS2DRenderer />
     <PerspectiveCamera />

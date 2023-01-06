@@ -1,12 +1,15 @@
 import _ from "lodash";
-import React, { useRef } from "react";
+import React from "react";
 import * as THREE from 'three';
 import { WithStore } from "../../core";
-import useWrapNode from "../../Hook/useWrapNode";
+import { getResolve } from "../../core/resolveValue";
+import usePromiseWrap from "../../Hook/usePromiseWrap";
 
 const Scene = function (props, ref) {
-  const instanceRef = useRef(new THREE.Scene())
-  useWrapNode(instanceRef.current, props, ref)
+  usePromiseWrap(props, ref, {
+    type: 'Scene',
+    f: getResolve(() => new THREE.Scene())
+  })
   return props.children
 }
 

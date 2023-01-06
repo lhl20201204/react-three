@@ -2,6 +2,8 @@ import _ from "lodash"
 import { useEffect, useRef, useState } from "react"
 import { _render } from "../core/render"
 import * as THREE from "three"
+import { getStore } from "../core/store"
+const store = getStore()
 
 export function useLoop(fn, option) {
   useEffect(() => {
@@ -47,8 +49,11 @@ export function useLoop(fn, option) {
           }
         }
       }
-
-      raf = window.requestAnimationFrame(runFn)
+      (async () => {
+         await store.mountedPromise
+         await store.runPromiseWrapList()
+         raf = window.requestAnimationFrame(runFn)
+      })()
     } catch (e) {
       console.error(e)
     }

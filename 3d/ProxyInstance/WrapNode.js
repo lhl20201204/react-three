@@ -1,10 +1,9 @@
 import _ from "lodash"
-import ProxyParent from "./ProxyParent"
+import PrimitiveParent from "./PrimitiveParent"
 
-class WrapNode extends ProxyParent{
+class WrapNode extends PrimitiveParent{
   constructor(node, config) {
     super(config)
-    this.type = _.get(node, 'type')
     this.node = node
     this.proxyData([['node', '']])
   }

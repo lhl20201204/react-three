@@ -1,11 +1,25 @@
 import _constant from "../constant"
 import { getAst } from "./ast"
 import { findNode } from "./findNode"
+import * as THREE from "three";
+import PromiseWrap from "../ProxyInstance/PromiseWrap";
+
 
 class Store {
+  mountedPromiseResolve = null
+  mountedPromise = new Promise(resolve => {
+    this.mountedPromiseResolve = resolve
+  })
+  loadingManager = new THREE.LoadingManager()
+  textureLoader = new THREE.TextureLoader(this.loadingManager)
+  setTextureLoader = this.textureLoader.setCrossOrigin('Anonymous')
+  watchDevList = []
+  resourceMap = {}
+  promiseWrapList = []
   camera = null
   renderer = null
   scene = null
+  control = null
   isInWorld = false
   lastCountDicts = null
   lastNodeStack = null
@@ -16,25 +30,49 @@ class Store {
   nameStack = []
   tree = {}
 
-  setCamera(x) {
+  pushDevFn(devConfig) {
+    this.watchDevList.push(devConfig)
+  }
+
+  pushPromiseWrap(p) {
+    if (!(p instanceof PromiseWrap)) {
+      throw new Error('必须是PromiseWrap的实例')
+    }
+    this.promiseWrapList.push(p)
+  }
+
+  async runPromiseWrapList() {
+    return Promise.all(this.promiseWrapList.map(x => x.promise))
+  }
+
+  setCamera = (x) => {
     this.camera = x
   }
 
-  setRenderer(x) {
+  setRenderer = (x) => {
     this.renderer = x
   }
 
-  setScene(x) {
+  setScene = (x) => {
     this.scene = x
   }
 
-  updateCameraRendererScene() {
-    this.setRenderer(_.map(findNode({ type: _constant.rendererList }, this.tree), x => _.get(x, _constant.node, {
-      domElement: document.createElement('div'),
-      setSize: () => { },
-    })))
-    this.setScene(_.map(findNode({ type: _constant.sceneList }, this.tree), x => _.get(x, _constant.node, {})))
-    this.setCamera(_.map(findNode({ type: _constant.cameraList }, this.tree), x => _.get(x, _constant.node, {})))
+  setControl = (x) => {
+    this.control = x;
+  }
+
+  async setNode(type, fn) {
+    const wrapList = await Promise.all(_.map(findNode({ type }, this.tree), x => _.get(x, _constant.promise, {})))
+    fn(wrapList.sort((a, b) => b.level - a.level).map(x => x.node))
+  }
+
+  async updateCameraRendererScene() {
+    return Promise.all([
+      [_constant.sceneList, this.setScene],
+      [_constant.cameraList, this.setCamera],
+      [_constant.rendererList, this.setRenderer],
+      [_constant.controlList, this.setControl],
+    ].map(x => this.setNode(x[0], x[1])))
   }
 
   getHandleResize = (dom) => {
@@ -47,6 +85,10 @@ class Store {
 
       for (const renderer of this.renderer) {
         renderer.setSize(dom.clientWidth, dom.clientHeight);
+      }
+
+      for (const control of this.control) {
+        control.update()
       }
     }
   }
@@ -79,7 +121,7 @@ class Store {
     if (!_.has(this.countDicts, name)) {
       this.countDicts[name] = 1
     } else {
-      if (['World', 'Scene'].includes(name)) {
+      if (['World'].includes(name)) {
         throw new Error(`只能有一个${name}实例`)
       }
       this.countDicts[name]++
