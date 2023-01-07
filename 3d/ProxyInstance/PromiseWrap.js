@@ -1,5 +1,5 @@
 import PrimitiveParent from "./PrimitiveParent"
-
+let pid = 0;
 export default class PromiseWrap {
   constructor(config) {
     const {
@@ -8,6 +8,7 @@ export default class PromiseWrap {
       rejectRef,
       type,
     } = config || {}
+    this.pid = pid++;
     let resolve = _.get(resolveRef, 'current'),
       reject = _.get(rejectRef, 'current')
     const promise = _.get(promiseRef, 'current') || new Promise((res, rej) => {
@@ -18,16 +19,39 @@ export default class PromiseWrap {
       if (value instanceof PrimitiveParent) {
         value.setLevel(this.level)
       }
-      this.value = value
+      this._value = value
     })
     this.parentPromiseResolve = null
-    this.parent = null
-    this.parentPromise = new Promise(r1=> {
+    this._parent = null
+    const parentPromise = new Promise(r1 => {
       this.parentPromiseResolve = r1
     })
-    this.children = [];
+    parentPromise.then(p => {
+      this._parent = p;
+    })
+    this.parentPromise = parentPromise
+    this._children = [];
+    this.childrenPromiseResolve = null
+    const childrenPromise = new Promise(r2 => {
+      this.childrenPromiseResolve = r2
+    })
+    childrenPromise.then(c => {
+      this._children = c;
+    })
+    this.childrenPromise = childrenPromise
+
+    this.siblingPromiseResolve = null
+    const siblingPromise = new Promise(r3 => {
+      this.siblingPromiseResolve = r3;
+    })
+    this._sibling = []
+    siblingPromise.then(s => {
+      this._sibling = s;
+    })
+    this.siblingPromise = siblingPromise;
+
     this.level = -1;
-    this.value = {};
+    this._value = {};
     this.resolve = resolve;
     this.reject = reject;
     this.promise = promise;
@@ -38,13 +62,18 @@ export default class PromiseWrap {
         if (selfAttr.includes(attr)) {
           _this[attr] = v
         } else {
-          _this.value[attr] = v
+          _this._value[attr] = v
         }
         return true
       },
       get(_this, attr) {
-        return selfAttr.includes(attr) ? _this[attr] : _this.value[attr]
+        return selfAttr.includes(attr) ? _this[attr] : _this._value[attr]
       }
     })
+  }
+
+  bindPromiseWrapRelation(level, parent) {
+    this.level = level;
+    this.parentPromiseResolve(parent)
   }
 }

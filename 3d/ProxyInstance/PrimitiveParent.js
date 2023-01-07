@@ -3,7 +3,7 @@ import _ from "lodash"
 import { firstToLowercase, firstToUppercase } from "../Util"
 
 let id = 0;
-const exclude = [..._constant.cameraList, ..._constant.rendererList, ..._constant.controlList, ..._constant.findAttrList]
+const exclude = _constant.excludeList;
 export default class PrimitiveParent {
   constructor(config) {
     this.id = id++
@@ -50,7 +50,7 @@ export default class PrimitiveParent {
       const attr = firstToLowercase([prefix, pAttr === 'position' ? '' : pAttr, dim].map(x => firstToUppercase(x)).join(''))
       Object.defineProperty(this, attr, {
         set(v) {
-            Reflect.set(this[target][pAttr], dim, v)
+          Reflect.set(this[target][pAttr], dim, v)
         },
         get() {
           return Reflect.get(this[target][pAttr], dim)

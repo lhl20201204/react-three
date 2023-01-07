@@ -1,4 +1,5 @@
 import PromiseWrap from "../ProxyInstance/PromiseWrap"
+import _ from "lodash";
 
 function getMidOrder(pre, suf) {
   const prel = pre.length
@@ -35,15 +36,15 @@ export function getAst(pre, suf) {
   }, {})
   const transform = (a, level = 1, parent = null) => {
     const { current } = dict[a.name].value
-    if (current instanceof PromiseWrap) {
-      current.level = level;
-      if (parent instanceof PromiseWrap) {
-        current.parent = parent;
-      }
-      current.parentPromiseResolve(parent)
-      if (parent) {
-        parent.children.push?.(current)
-      }
+    if ((current instanceof PromiseWrap)) {
+      current.bindPromiseWrapRelation(level, parent)
+      const childrenPromiseWrap = a.children.map(c => dict[c.name].value.current)
+      current.childrenPromiseResolve(childrenPromiseWrap)
+      childrenPromiseWrap.map(pw => {
+        if (pw instanceof PromiseWrap) {
+          pw.siblingPromiseResolve(childrenPromiseWrap.filter(x => x !== pw))
+        }
+      })
     }
     return ({
       ...dict[a.name],

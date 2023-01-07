@@ -13,7 +13,7 @@ export function WithStore(Comp, option) {
     const selfRef = useRef(null)
     const nameRef = useRef('')
     const isFnRef = typeof ref === 'function'
-    const currentRef = ( isFnRef || !ref)  ? selfRef : ref
+    const currentRef = (isFnRef || !ref) ? selfRef : ref
 
     if (option.name === 'World') {
       store.setIsInWorld(true)
@@ -23,6 +23,8 @@ export function WithStore(Comp, option) {
       store.addCountDicts(name)
       nameRef.current = store.getName(name)
       store.pushName(nameRef.current)
+    } else {
+      throw new Error(`<${option.name}/>必须是<World > </World>的子组件, 暂不支持独立使用 或者 非含<World />顶层组件更新`)
     }
 
     if (currentRef.current) {
@@ -47,7 +49,7 @@ export function WithStore(Comp, option) {
     })
 
     return <Comp {..._.omit(props, ['children', _constant.funRef])} ref={currentRef} {
-      ...isFnRef ? {[_constant.funRef]: ref} : {}
+      ...isFnRef ? { [_constant.funRef]: ref } : {}
     }>
       {props.children}
     </Comp>;

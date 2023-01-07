@@ -5,14 +5,16 @@ import { WithStore } from "../../core";
 import { getResolve } from "../../core/resolveValue";
 import usePromiseWrap from "../../Hook/usePromiseWrap";
 
-const Scene = function (props, ref) {
+const AxesHelper = function (props, ref) {
   usePromiseWrap(props, ref, {
-    type: 'Scene',
-    f: getResolve(() => new THREE.Scene()),
+    type: 'AxesHelper',
+    f: getResolve(() => new THREE.AxesHelper(
+      _.get(props, 'size', 5)
+    ))
   })
   return props.children
 }
 
-export default WithStore(React.forwardRef(Scene), {
-  name: 'Scene'
+export default WithStore(React.forwardRef(AxesHelper), {
+  name: 'AxesHelper'
 });

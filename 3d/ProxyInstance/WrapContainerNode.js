@@ -1,11 +1,7 @@
 import _ from "lodash"
 import PrimitiveParent from "./PrimitiveParent"
-import * as THREE from "three"
-import _constant from "../constant"
-import { getStore } from "../core/store"
-const store = getStore()
 
-class WrapMaterialNode extends PrimitiveParent {
+class WrapContainerNode extends PrimitiveParent{
   constructor(node, config) {
     super(config)
     this.node = node
@@ -32,4 +28,4 @@ class WrapMaterialNode extends PrimitiveParent {
   }
 }
 
-export default WrapMaterialNode
+export default WrapContainerNode

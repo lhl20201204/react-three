@@ -12,17 +12,17 @@ export function useLoop(fn, option) {
     const clock = new THREE.Clock()
     try {
       const step = (t = 0) => {
-        fn({ dela: clock.getDelta(), t })
+        fn({ clock, t })
         _render()
         raf = window.requestAnimationFrame(runFn)
       }
       const step2 = (t = 0) => {
-        fn({ dela: clock.getDelta(), t })
+        fn({ clock, t })
         raf = window.requestAnimationFrame(runFn)
       }
 
       const step3 = (t = 0) => {
-        fn({ dela: clock.getDelta(), t })
+        fn({ clock, t })
         _render()
         if (t <= option.time) {
           raf = window.requestAnimationFrame(runFn)
@@ -30,7 +30,7 @@ export function useLoop(fn, option) {
       }
 
       const step4 = (t = 0) => {
-        fn({ dela: clock.getDelta(), t })
+        fn({ clock, t })
         if (t <= option.time) {
           raf = window.requestAnimationFrame(runFn)
         }

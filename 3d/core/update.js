@@ -9,7 +9,7 @@ const store = getStore()
 export function update() {
   ; (async () => {
     console.log('update', store.tree)
-    await store.updateCameraRendererScene()
+    await store.updateContainer()
     const sceneItems = findNode({ type: _constant.sceneList }, store.tree);
 
     for(const scene of store.scene) {

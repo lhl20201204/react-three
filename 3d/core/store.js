@@ -12,7 +12,7 @@ class Store {
   })
   loadingManager = new THREE.LoadingManager()
   textureLoader = new THREE.TextureLoader(this.loadingManager)
-  setTextureLoader = this.textureLoader.setCrossOrigin('Anonymous')
+  _setTextureLoader = this.textureLoader.setCrossOrigin('Anonymous')
   watchDevList = []
   resourceMap = {}
   promiseWrapList = []
@@ -20,6 +20,8 @@ class Store {
   renderer = null
   scene = null
   control = null
+  container = null
+  domElement = null
   isInWorld = false
   lastCountDicts = null
   lastNodeStack = null
@@ -30,8 +32,27 @@ class Store {
   nameStack = []
   tree = {}
 
+  setDomElement(x) {
+    this.domElement = x;
+  }
+
   pushDevFn(devConfig) {
     this.watchDevList.push(devConfig)
+  }
+
+  runWatchDevList() {
+    this.watchDevList.map(({ cb, filter }) => {
+      if (typeof cb !== 'function') {
+        throw new Error('cb 必须是函数')
+      }
+      if (filter && typeof filter !== 'function') {
+        throw new Error(' 如果传了filter 其必须是函数')
+      }
+      const promiseWrapList = filter ? this.promiseWrapList.filter(filter) : this.promiseWrapList
+      Promise.all(promiseWrapList.map(x => x.promise)).then(res => {
+        cb(res, promiseWrapList)
+      })
+    })
   }
 
   pushPromiseWrap(p) {
@@ -61,13 +82,18 @@ class Store {
     this.control = x;
   }
 
+  setContainer = (x) => {
+    this.container = x;
+  }
+
   async setNode(type, fn) {
     const wrapList = await Promise.all(_.map(findNode({ type }, this.tree), x => _.get(x, _constant.promise, {})))
     fn(wrapList.sort((a, b) => b.level - a.level).map(x => x.node))
   }
 
-  async updateCameraRendererScene() {
+  async updateContainer() {
     return Promise.all([
+      [_constant.containerList, this.setContainer],
       [_constant.sceneList, this.setScene],
       [_constant.cameraList, this.setCamera],
       [_constant.rendererList, this.setRenderer],
@@ -76,7 +102,7 @@ class Store {
   }
 
   getHandleResize = (dom) => {
-    this.dom = dom
+    this.domElement = dom
     return () => {
       for (const camera of this.camera) {
         camera.aspect = dom.clientWidth / dom.clientHeight;

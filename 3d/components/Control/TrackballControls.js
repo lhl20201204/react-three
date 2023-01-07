@@ -1,14 +1,14 @@
 import _ from "lodash";
 import React from "react";
 import { WithStore } from "../../core";
-import { OrbitControls as OrbitControls2 } from 'three/examples/jsm/controls/OrbitControls.js';
+import { TrackballControls as TrackballControls2 } from 'three/examples/jsm/controls/TrackballControls.js';
 import usePromiseWrap from "../../Hook/usePromiseWrap";
 import _constant from "../../constant";
 import { WrapNode } from "../../ProxyInstance";
 
-const OrbitControls = function (props, ref) {
+const TrackballControls = function (props, ref) {
   usePromiseWrap(props, ref, {
-    type: 'OrbitControls',
+    type: 'TrackballControls',
     onSiblingLoad: ({ resolve }, config) => ({
       cb: (res) => {
         const camera= _.get(_.find(res, x => _constant.cameraList.includes(x.type)), 'node')
@@ -16,7 +16,7 @@ const OrbitControls = function (props, ref) {
         if (!camera || !renderer) {
           throw new Error('同一层级必须有camera和renderer')
         }
-        const control = new OrbitControls2(camera,renderer.domElement)
+        const control = new TrackballControls2(camera,renderer.domElement)
         resolve(new WrapNode(control, config))
       }
     })
@@ -24,6 +24,6 @@ const OrbitControls = function (props, ref) {
   return props.children
 }
 
-export default WithStore(React.forwardRef(OrbitControls), {
-  name: 'OrbitControls'
+export default WithStore(React.forwardRef(TrackballControls), {
+  name: 'TrackballControls'
 });

@@ -7,14 +7,18 @@ import PromiseWrap from "../ProxyInstance/PromiseWrap";
 const store = getStore()
 
 export default function usePromiseWrap(props, ref, config) {
+  const promiseWrapRef = useRef(null)
   const configRef = useRef({
     ...config,
-    promiseWrap: new PromiseWrap(config),
+    promiseWrap: promiseWrapRef.current || ((() => {
+      promiseWrapRef.current = new PromiseWrap(config)
+      return promiseWrapRef.current
+    })()),
   })
   useEffect(() => {
     const { promiseWrap } = configRef.current
     const { promise, resolve, reject } = promiseWrap
-    const { type, f, onPreLoad, onParentLoad } = config;
+    const { type, f, onPreLoad, onParentLoad, onChildrenLoad, onSiblingLoad } = config;
     if (ref) {
       if (!type) {
         throw new Error('no type')
@@ -27,6 +31,13 @@ export default function usePromiseWrap(props, ref, config) {
 
       ref.current = promiseWrap
 
+      if (f) {
+        resolve(typeof f === 'function' ? f(configRef.current) : f)
+      }
+
+      if (onPreLoad) {
+        store.pushDevFn(onPreLoad({ resolve, reject, promise }, configRef.current))
+      }
 
       if (onParentLoad) {
         promiseWrap.parentPromise
@@ -34,17 +45,28 @@ export default function usePromiseWrap(props, ref, config) {
           .then(onParentLoad({ resolve, reject, promise }, configRef.current))
       }
 
-      if (f) {
-        resolve(typeof f === 'function' ? f(configRef.current) : f)
+      for (const { onload, attr } of [{
+        onload: onChildrenLoad,
+        attr: 'childrenPromise',
+      }, {
+        onload: onSiblingLoad,
+        attr: 'siblingPromise',
+      }]) {
+        if (onload) {
+          const { cb, filter } = onload({ resolve, reject, promise }, configRef.current)
+          if (!cb) {
+            throw new Error('返回的对象必须要有cb属性')
+          }
+          promiseWrap[attr]
+            .then(x => Promise.all((filter ? x.filter(filter) : x).map(x => x.promise)))
+            .then(cb)
+        }
       }
-      if (onPreLoad) {
-        store.pushDevFn(onPreLoad({ resolve, reject, promise }, configRef.current))
-      }
+
     }
-    (async () => {
-      await promise;
+    promise.then(() => {
       promiseWrap.updateProps(_.omit(props, _constant.propsOmit))
-    })();
+    })
   }, [])
   return configRef
 }
