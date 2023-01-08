@@ -6,7 +6,7 @@ const cameraList = ['PerspectiveCamera']
 const rendererList = ['WebGLRenderer', 'CSS2DRenderer', 'CSS3DRenderer']
 const controlList = ['OrbitControls', 'TrackballControls']
 const findAttrList = ['FindAttr']
-
+const raycasterList = ['Raycaster']
 const _constant = {
   cameraList,
   rendererList,
@@ -14,13 +14,15 @@ const _constant = {
   controlList,
   containerList,
   findAttrList,
+  raycasterList,
   excludeList: [
     ...containerList,
     ...sceneList,
     ...cameraList,
     ...rendererList,
     ...controlList,
-    ...findAttrList
+    ...findAttrList,
+    ...raycasterList,
   ],
   promise: 'value.current.promise',
   node: 'value.current.node',

@@ -13,11 +13,15 @@ const WebGLRenderer = function (props, ref) {
     f: getResolve(() => {
       const dom = store.domElement
       const renderer = new THREE.WebGLRenderer()
-      renderer.setSize(dom.clientWidth, dom.clientHeight);
-      renderer.setPixelRatio?.(window.devicePixelRatio);
-      // renderer.domElement.style.position = 'absolute';
-      // renderer.domElement.style.top = '0px';
-      dom.appendChild(renderer.domElement);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.domElement.style.position = 'absolute';
+      renderer.domElement.style.top = '0px';
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
+      if (_.get(props, 'pointerEvents')) {
+        renderer.domElement.style.pointerEvents = _.get(props, 'pointerEvents');
+      }
+      document.body.appendChild(renderer.domElement);
       return renderer
     })
   })

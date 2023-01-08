@@ -14,7 +14,7 @@ const PerspectiveCamera = function (props, ref) {
       const dom = store.domElement;
       const camera = new THREE.PerspectiveCamera(
       _.get(props, 'fov', 45),
-      _.get(props, 'aspect', (dom.clientWidth / dom.clientHeight)),
+      _.get(props, 'aspect', (window.innerWidth / window.innerHeight)),
       _.get(props, 'near', 0.1),
       _.get(props, 'far', 2000)
     )

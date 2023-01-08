@@ -5,11 +5,11 @@ import * as THREE from "three"
 import { getStore } from "../core/store"
 const store = getStore()
 
-export function useLoop(fn, option) {
+export function useLoop(fn, option={}, dev=[]) {
   useEffect(() => {
     let raf = null
     let runFn = null
-    const clock = new THREE.Clock()
+    let clock = new THREE.Clock()
     try {
       const step = (t = 0) => {
         fn({ clock, t })
@@ -60,6 +60,8 @@ export function useLoop(fn, option) {
 
     return () => {
       raf && window.cancelAnimationFrame(raf)
+      clock = null
+      runFn = null
     }
-  }, [])
+  }, dev)
 }

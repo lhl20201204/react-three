@@ -18,7 +18,7 @@ export default class PrimitiveParent {
   updateProps(props) {
     this.props = props
     for (const attr in props) {
-      this[attr] = props[attr] || 0
+      this[attr] = props[attr] ?? 0
     }
   }
 

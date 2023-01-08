@@ -101,21 +101,18 @@ class Store {
     ].map(x => this.setNode(x[0], x[1])))
   }
 
-  getHandleResize = (dom) => {
-    this.domElement = dom
-    return () => {
-      for (const camera of this.camera) {
-        camera.aspect = dom.clientWidth / dom.clientHeight;
-        camera.updateProjectionMatrix();
-      }
+  getHandleResize = () => {
+    for (const camera of this.camera) {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    }
 
-      for (const renderer of this.renderer) {
-        renderer.setSize(dom.clientWidth, dom.clientHeight);
-      }
+    for (const renderer of this.renderer) {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
 
-      for (const control of this.control) {
-        control.update()
-      }
+    for (const control of this.control) {
+      control.update()
     }
   }
 

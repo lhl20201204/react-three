@@ -4,19 +4,20 @@ import { WithStore } from "../../core";
 import { CSS3DRenderer as CSS3DRenderer2 } from "three/examples/jsm/renderers/CSS3DRenderer"
 import usePromiseWrap from "../../Hook/usePromiseWrap";
 import { getResolve } from "../../core/resolveValue";
-import { getStore } from "../../core/store";
-const store = getStore()
-
 const CSS3DRenderer = function (props, ref) {
   usePromiseWrap(props, ref, {
     type: 'CSS3DRenderer',
     f: getResolve(() => {
-      const dom = store.domElement;
       const renderer = new CSS3DRenderer2(_.get(props, 'parameters', undefined))
-      renderer.setSize(dom.clientWidth, dom.clientHeight);
+      renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.domElement.style.position = 'absolute';
       renderer.domElement.style.top = '0px';
-      dom.appendChild(renderer.domElement);
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
+      if (_.get(props, 'pointerEvents')) {
+        renderer.domElement.style.pointerEvents = _.get(props, 'pointerEvents');
+      }
+      document.body.appendChild(renderer.domElement);
       return renderer
   })
   })

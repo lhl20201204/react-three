@@ -13,6 +13,7 @@ import { OrbitControls, TrackballControls } from "./components/Control"
 import { usePreload } from "./Hook/usePreload";
 import { Container } from "./components/Container";
 import { AxesHelper } from "./components/Helper";
+import { Raycaster } from "./components/Raycaster";
 
 export  {
   THREE,
@@ -32,6 +33,7 @@ export  {
   Container,
   TrackballControls,
   AxesHelper,
+  Raycaster,
   usePreload,
   useLoop,
   mixColor,
