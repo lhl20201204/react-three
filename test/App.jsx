@@ -4,8 +4,17 @@ import { Scene } from "../3d/components/Scene";
 import "./index.scss";
 const rand = x => Math.floor(Math.random() * x)
 const getC = () => `rgb(${rand(255)}, ${rand(255)}, ${rand(255)})`
+const skyboxUrl = [
+  './px.png',
+  './nx.png',
+  './py.png',
+  './ny.png',
+  './pz.png',
+  './nz.png',
+]
 function App(props) {
   const [show, setShow] = useState(false)
+  const [boxPos, setBoxPos] = useState({ x: -2, y: -0.5, z: 0 })
   const cameraRef = useRef()
   const boxRef = useRef()
   const boxMaterialRef = useRef()
@@ -49,66 +58,66 @@ function App(props) {
     // camera.x = 2 * (sin - 0.5)
     // camera.y = 2 * (cos - 0.5)
     // camera.z = 20
-    box.rotationX += 0.01
-    box.rotationY += 0.01
-    boxMaterial.color = mixColor([255, 0, 0], [0, 255, 255], Math.abs(sin))
-    // css3d.rotationY += 0.01
-    // css3d2.rotationY += 0.02
-    // css2d.x = 2 * (sin - 0.5)
-    // css2d.z = 2 * (cos - 0.5)
+    // box.rotationX += 0.01
+    // box.rotationY += 0.01
+    boxMaterial.color = mixColor([125, 125, 125], [0, 255, 255], Math.abs(sin / 3))
+    css3d.rotationY += 0.01
+    css3d2.rotationY += 0.02
+    css2d.x = 0.5 * (sin - 0.5)
+    css2d.z = 0.5 * (cos - 0.5)
     earth.rotationY += 0.01
   })
 
-  const camera = <PerspectiveCamera ref={cameraRef} z={20} />
+  const camera = <PerspectiveCamera ref={cameraRef} y={5} z={20} />
+  const ground = <Box width={1000} depth={1000} height={2} y={-1.5} onDoubleClick={(x) => {
+    setBoxPos(x.point)
+  }}>
+    <Material color={'green'}>
+    </Material>
+  </Box>
   return (
     <World>
       <Container>
-        <Scene skybox={[
-          './px.png',
-          './nx.png',
-          './py.png',
-          './ny.png',
-          './pz.png',
-          './nz.png',
-        ]}
+        <Raycaster />
+        <WebGLRenderer />
+        <TrackballControls />
+        <CSS2DRenderer pointerEvents={'none'} />
+        {camera}
+        <Scene
+          skybox={skyboxUrl}
         >
+          {ground}
           <AmbientLight></AmbientLight>
-          <Box x={2} visible={show}>
+          <Box
+            {...boxPos}
+            ref={boxRef}>
+            <Material ref={boxMaterialRef} map={'./top.webp'} side={THREE.DoubleSide}>
+            </Material>
+            <CSS2DObject ref={css2dRef} y={1} >
+              <div style={{ color: 'white' }} >我是2d</div>
+            </CSS2DObject>
+          </Box>
+          <AxesHelper />
+          <Box x={2} z={2} visible={show}>
             <Material color={'yellow'}></Material>
           </Box>
-          <Sphere x={4} ref={earthRef}>
+          <Sphere x={4} z={4} ref={earthRef}>
             <Material
               map={'./earth.webp'}
               color={'rgba(127, 127, 127)'}
               side={THREE.DoubleSide}>
             </Material>
-          </Sphere>
-          <Box
-            x={-2}
-            ref={boxRef}>
-            <Material ref={boxMaterialRef} map={'./top.webp'}>
-            </Material>
-            <CSS2DObject ref={css2dRef} x={2} y={5}>
-              <div style={{ color: 'white' }} onClick={(el) => {
-                console.log('2del')
-              }}>我是2d</div>
+            <CSS2DObject y={1}>
+              <div style={{ color: 'white' }} y={2}>地球</div>
             </CSS2DObject>
-          </Box>
-          <AxesHelper />
+          </Sphere>
         </Scene>
-        <Raycaster onClick={(insect) => {
-          console.log('scene1', insect)
-        }} />
-        <WebGLRenderer />
-        {/* <TrackballControls /> */}
-        <CSS2DRenderer pointerEvents={'none'} />
-        {camera}
       </Container>
       <Container>
         <Scene >
           {
             colorConfigRef.current.map(item =>
-              <CSS3DObject key={item.i} ref={item.ref} x={-3 * item.i} y={2 * item.i} scaleX={0.01} scaleY={0.01}>
+              <CSS3DObject key={item.i} ref={item.ref} x={-3 * item.i} y={2 * item.i} z={-2} scaleX={0.01} scaleY={0.01}>
                 <div
                   onClick={(el) => {
                     console.log('3del', el)
@@ -120,12 +129,8 @@ function App(props) {
           }
         </Scene>
         <CSS3DRenderer pointerEvents={'none'} />
-        <Raycaster onClick={(insect) => {
-          console.log('scene2', insect) // ？
-        }} />
+        <Raycaster />
         {camera}
-        {/* <OrbitControls /> */}
-        {/* <TrackballControls /> */}
       </Container>
     </World>
 
@@ -133,6 +138,6 @@ function App(props) {
 }
 
 export default () => {
-  const { progress } = usePreload(['./top.webp', './earth.webp'])
+  const { progress } = usePreload(['./top.webp', './earth.webp', skyboxUrl])
   return progress === 1 && <App />
 }

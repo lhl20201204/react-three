@@ -5,7 +5,7 @@ import * as THREE from "three"
 import { getStore } from "../core/store"
 const store = getStore()
 
-export function useLoop(fn, option={}, dev=[]) {
+export function useLoop(fn, dev=[], option={}) {
   useEffect(() => {
     let raf = null
     let runFn = null

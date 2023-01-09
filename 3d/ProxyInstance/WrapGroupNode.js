@@ -7,6 +7,7 @@ class WrapGroupNode extends PrimitiveParent{
     this.group = group
     this.child = _.get(group, 'children.0')
     this.child.userData.proxy = this
+    this.child.userData.type = _.get(config, 'type')
     this.proxyData()
     const selfAttr = [
       ...Reflect.ownKeys(this),

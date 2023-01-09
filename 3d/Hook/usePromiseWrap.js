@@ -10,6 +10,7 @@ export default function usePromiseWrap(props, ref, config) {
   const promiseWrapRef = useRef(null)
   const configRef = useRef({
     ...config,
+    props,
     promiseWrap: promiseWrapRef.current || ((() => {
       promiseWrapRef.current = new PromiseWrap(config)
       return promiseWrapRef.current

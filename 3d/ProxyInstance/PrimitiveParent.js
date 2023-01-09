@@ -7,12 +7,13 @@ const exclude = _constant.excludeList;
 export default class PrimitiveParent {
   constructor(config) {
     this.id = id++
-    if (!config.type || !config.promiseWrap) {
+    if (!config.type || !config.promiseWrap || !config.props) {
       console.log(config)
       throw new Error('实例化失败')
     }
     this.promiseWrap = _.get(config, 'promiseWrap')
     this.type = _.get(config, 'type')
+    this.props = _.get(config, 'props')
     this.level = -1
   }
   updateProps(props) {

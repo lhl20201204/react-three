@@ -12,13 +12,14 @@ const CSS3DObject = function (props, ref) {
     type: 'CSS3DObject',
   })
 
-  return <div ref={(el) => {
-    if (el && firstRef.current) {
+  return <div ref={(els) => {
+    if (els && firstRef.current) {
       firstRef.current = false;
       const { current: { promiseWrap, ...rest } } = configRef;
-      const ell = el.childNodes[0]
-      ell.style.pointerEvents = 'auto';
-      const node = new CSS3DObject2(ell)
+      const el = els.childNodes[0]
+      el.style.pointerEvents = 'auto';
+      el.style.cursor = 'pointer';
+      const node = new CSS3DObject2(el)
       const group = new THREE.Group()
       group.add(node)
       promiseWrap.resolve(new WrapCSSNode(group, { promiseWrap, ...rest})) // ?

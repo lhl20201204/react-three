@@ -3,8 +3,10 @@ import React from "react";
 import * as THREE from 'three';
 import { WithStore } from "../../core";
 import { getResolve } from "../../core/resolveValue";
+import { getStore } from "../../core/store";
 import usePromiseWrap from "../../Hook/usePromiseWrap";
 
+const store = getStore()
 const Scene = function (props, ref) {
   usePromiseWrap(props, ref, {
     type: 'Scene',
@@ -15,8 +17,8 @@ const Scene = function (props, ref) {
         'skybox',
         []
       )
-      if (skyboxSrc) {
-         scene.background = new THREE.CubeTextureLoader().load(skyboxSrc);
+      if (skyboxSrc.length) {
+         scene.background = store.resourceMap[JSON.stringify(skyboxSrc)];
       }
       return scene;
     }),

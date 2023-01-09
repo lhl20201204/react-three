@@ -15,6 +15,7 @@ export function mount() {
       for (const sceneItem of sceneItems) {
         traverseAstNode(sceneItem)
       }
+      await store.runPromiseWrapList()
       _render()
     })();
 }

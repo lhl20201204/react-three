@@ -1,5 +1,5 @@
 import _ from "lodash";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { WithStore } from "../../../core";
 import { CSS2DObject as Css2DObject } from "three/examples/jsm/renderers/CSS2DRenderer"
 import { WrapCSSNode } from "../../../ProxyInstance";
@@ -12,11 +12,15 @@ const CSS2DObject = function (props, ref) {
     type: 'CSS2DObject',
   })
 
-  return <div ref={(el) => {
-    if (el && firstRef.current) {
+
+  return <div ref={(els) => {
+    if (els && firstRef.current) {
       firstRef.current = false
       const { current: { promiseWrap, ...rest } } = promiseWrapRef;
-      el.style.pointerEvents = 'auto';
+      const el = els.childNodes[0]
+      el.addEventListener('click', (x) => {
+        console.log(x)
+      })
       const node = new Css2DObject(el)
       const group = new THREE.Group()
       group.add(node)

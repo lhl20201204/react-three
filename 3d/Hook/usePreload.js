@@ -5,7 +5,12 @@ import { getStore } from "../core/store";
 
 const store = getStore()
 
-const getLoader = (suffix) => {
+const getLoader = (url) => {
+  if (Array.isArray(url) && url.length === 6) {
+    return 'cubeTextureLoader'
+  }
+  url = url + ''
+  const suffix = url.slice(url.lastIndexOf('.'))
   if (suffix.match(/(jpg|png|webp)/)) {
     return 'textureLoader'
   }
@@ -15,10 +20,8 @@ export function usePreload(urlArr, config) {
   const [progress, setProgress] = useState(0)
   useEffect(() => {
     _.reduce(urlArr, (resourceMap, url) => {
-      url = url + ''
-      const suffix = url.slice(url.lastIndexOf('.'))
-      store[getLoader(suffix)].load(url, (texture) => {
-        resourceMap[url] = texture
+      store[getLoader(url)].load(url, (texture) => {
+        resourceMap[Array.isArray(url) ? JSON.stringify(url) : url] = texture
       })
       return resourceMap;
     }, store.resourceMap)

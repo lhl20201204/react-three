@@ -1,7 +1,4 @@
 import _ from "lodash";
-import { getStore } from "./store";
-
-const store = getStore()
 export function findNode(option, obj) {
   const res = []
   for(const child of obj.children) {

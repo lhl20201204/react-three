@@ -12,7 +12,10 @@ class Store {
   })
   loadingManager = new THREE.LoadingManager()
   textureLoader = new THREE.TextureLoader(this.loadingManager)
-  _setTextureLoader = this.textureLoader.setCrossOrigin('Anonymous')
+  cubeTextureLoader = new THREE.CubeTextureLoader(this.loadingManager)
+  _setTextureLoader = [this.textureLoader, this.cubeTextureLoader].map(
+    x => x.setCrossOrigin('Anonymous')
+  )
   watchDevList = []
   resourceMap = {}
   promiseWrapList = []

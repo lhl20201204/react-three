@@ -28,14 +28,18 @@ const Raycaster = function (props, ref) {
 
   useEffect(() => {
     let mouse = new THREE.Vector2();
-    const handle = event => {
+    const getHandle = (methodName) => event => {
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-      ref.current?.checkTouchElement(mouse)
+      ref.current?.[methodName](mouse)
     }
+    const handle = getHandle('checkClickTouchElement')
+    const handle2 = getHandle('checkDbClickTouchElemnt')
     window.addEventListener('click', handle, false);
+    window.addEventListener('dblclick', handle2, false)
     return () => {
       window.removeEventListener('click', handle, false);
+      window.removeEventListener('dblclick', handle2, false)
       mouse = null
     }
   }, [])
