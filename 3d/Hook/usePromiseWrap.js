@@ -2,7 +2,7 @@ import _ from "lodash";
 import React, { useEffect, useRef } from "react";
 import _constant from "../constant";
 import { getStore } from "../core/store";
-import PromiseWrap from "../ProxyInstance/PromiseWrap";
+import { PromiseWrap } from "../ProxyInstance";
 
 const store = getStore()
 
@@ -68,6 +68,12 @@ export default function usePromiseWrap(props, ref, config) {
     promise.then(() => {
       promiseWrap.updateProps(_.omit(props, _constant.propsOmit))
     })
+    return () => {
+      if(!store.deletePromiseWrap(promiseWrap)) {
+        throw new Error('删除失败')
+      }
+      promiseWrap._removeFromParent()
+    }
   }, [])
   return configRef
 }

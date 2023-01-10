@@ -17,6 +17,9 @@ const CSS3DObject = function (props, ref) {
       firstRef.current = false;
       const { current: { promiseWrap, ...rest } } = configRef;
       const el = els.childNodes[0]
+      if (!el || els.childNodes.length > 1) {
+        throw new Error('CSS3DObject有且只有一个子元素')
+      }
       el.style.pointerEvents = 'auto';
       el.style.cursor = 'pointer';
       const node = new CSS3DObject2(el)

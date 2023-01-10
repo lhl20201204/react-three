@@ -2,7 +2,7 @@ import _ from "lodash";
 import React from "react";
 import { WithStore } from "../../core";
 import usePromiseWrap from "../../Hook/usePromiseWrap";
-import { ContainerNode, Wrap } from "../../ProxyInstance";
+import { ContainerNode, WrapSelfNode } from "../../ProxyInstance";
 
 const Container = function (props, ref) {
   usePromiseWrap(props, ref, {
@@ -10,7 +10,7 @@ const Container = function (props, ref) {
     onChildrenLoad({ resolve }, config) {
       return {
         cb: (res) => {
-          resolve(new Wrap(new ContainerNode(res), config))
+          resolve(new WrapSelfNode(new ContainerNode(res, config), config))
         }
       }
     },

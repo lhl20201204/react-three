@@ -5,7 +5,7 @@ import { WebGLRenderer,CSS2DRenderer, CSS3DRenderer } from "./components/Rendere
 import Box from "./components/Object3d/Box";
 import Sphere from "./components/Object3d/Sphere";
 import { useLoop } from "./Hook/useLoop";
-import { FindAttr, Material } from "./components/Find"
+import { Field, FindAttr, Material } from "./components/Find"
 import { mixColor } from "./Util";
 import AmbientLight from "./components/Light/AmbientLight";
 import { CSS2DObject, CSS3DObject } from "./components/CSSObject";
@@ -14,6 +14,7 @@ import { usePreload } from "./Hook/usePreload";
 import { Container } from "./components/Container";
 import { AxesHelper } from "./components/Helper";
 import { Raycaster } from "./components/Raycaster";
+import { Model } from "./components/Model";
 
 export  {
   THREE,
@@ -34,6 +35,8 @@ export  {
   TrackballControls,
   AxesHelper,
   Raycaster,
+  Field,
+  Model,
   usePreload,
   useLoop,
   mixColor,

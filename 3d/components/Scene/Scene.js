@@ -19,6 +19,9 @@ const Scene = function (props, ref) {
       )
       if (skyboxSrc.length) {
          scene.background = store.resourceMap[JSON.stringify(skyboxSrc)];
+         if (!scene.background) {
+          throw new Error('资源必须预加载')
+         }
       }
       return scene;
     }),

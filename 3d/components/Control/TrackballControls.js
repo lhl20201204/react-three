@@ -4,7 +4,7 @@ import { WithStore } from "../../core";
 import { TrackballControls as TrackballControls2 } from 'three/examples/jsm/controls/TrackballControls.js';
 import usePromiseWrap from "../../Hook/usePromiseWrap";
 import _constant from "../../constant";
-import { Wrap } from "../../ProxyInstance";
+import { WrapNode } from "../../ProxyInstance";
 
 const TrackballControls = function (props, ref) {
   usePromiseWrap(props, ref, {
@@ -15,10 +15,10 @@ const TrackballControls = function (props, ref) {
         const renderers = _.map(_.filter(res, x => _constant.rendererList.includes(x.type)), x => _.get(x, 'node'))
         const renderer = _.find(renderers, x => x.domElement.style.pointerEvents !== 'none')
         if (!camera || !renderers?.length || !renderer) {
-          throw new Error('同一层级必须有camera和可以透传pointerEvents的renderer')
+          throw new Error('<Container/>必须有 camera 和 pointerEvents不为none的renderer')
         }
         const control = new TrackballControls2(camera, renderer.domElement)
-        resolve(new Wrap(control, config))
+        resolve(new WrapNode(control, config))
       }
     })
   })

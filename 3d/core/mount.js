@@ -16,6 +16,6 @@ export function mount() {
         traverseAstNode(sceneItem)
       }
       await store.runPromiseWrapList()
-      _render()
+      requestAnimationFrame(_render)
     })();
 }

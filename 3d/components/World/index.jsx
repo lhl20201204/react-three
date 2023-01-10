@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { WithStore } from "../../core";
 import './index.less'
 import { getStore } from "../../core/store";
-import { WorldNode, Wrap } from "../../ProxyInstance";
+import { WorldNode, WrapSelfNode } from "../../ProxyInstance";
 import usePromiseWrap from "../../Hook/usePromiseWrap";
 
 const store = getStore()
@@ -12,7 +12,7 @@ function World(props, ref) {
   usePromiseWrap(props, ref, {
     type: 'World',
     f(config) {
-      return new Wrap(new WorldNode(), config)
+      return new WrapSelfNode(new WorldNode({}, config), config)
     },
   })
 

@@ -1,10 +1,10 @@
-import _constant from "../constant";
+import _constant from "../../constant";
 import _ from "lodash"
-import { firstToLowercase, firstToUppercase } from "../Util"
+import { firstToLowercase, firstToUppercase } from "../../Util"
 
 let id = 0;
 const exclude = _constant.excludeList;
-export default class PrimitiveParent {
+export default class PrimitiveWrap {
   constructor(config) {
     this.id = id++
     if (!config.type || !config.promiseWrap || !config.props) {

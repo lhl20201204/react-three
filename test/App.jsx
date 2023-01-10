@@ -1,5 +1,6 @@
+import _ from "lodash";
 import React, { useEffect, useRef, useState } from "react";
-import { AmbientLight, AxesHelper, Box, Container, CSS2DObject, CSS2DRenderer, CSS3DObject, CSS3DRenderer, Material, mixColor, OrbitControls, PerspectiveCamera, Raycaster, Sphere, THREE, TrackballControls, useLoop, usePreload, WebGLRenderer, World } from "../3d";
+import { AmbientLight, AxesHelper, Box, Container, CSS2DObject, CSS2DRenderer, CSS3DObject, CSS3DRenderer, Field, Material, mixColor, Model, OrbitControls, PerspectiveCamera, Raycaster, Sphere, THREE, TrackballControls, useLoop, usePreload, WebGLRenderer, World } from "../3d";
 import { Scene } from "../3d/components/Scene";
 import "./index.scss";
 const rand = x => Math.floor(Math.random() * x)
@@ -14,7 +15,7 @@ const skyboxUrl = [
 ]
 function App(props) {
   const [show, setShow] = useState(false)
-  const [boxPos, setBoxPos] = useState({ x: -2, y: -0.5, z: 0 })
+  const [boxPos, setBoxPos] = useState({ x: -2, y: 0.5, z: 0 })
   const cameraRef = useRef()
   const boxRef = useRef()
   const boxMaterialRef = useRef()
@@ -68,13 +69,24 @@ function App(props) {
     earth.rotationY += 0.01
   })
 
-  const camera = <PerspectiveCamera ref={cameraRef} y={5} z={20} />
-  const ground = <Box width={1000} depth={1000} height={2} y={-1.5} onDoubleClick={(x) => {
-    setBoxPos(x.point)
-  }}>
-    <Material color={'green'}>
-    </Material>
-  </Box>
+  const camera = <PerspectiveCamera ref={cameraRef} {...{ // 初次为默认值，后续为control的移动值
+    x: _.get(cameraRef.current, 'x', 5),
+    z: _.get(cameraRef.current, 'z', 20),
+    y: _.get(cameraRef.current, 'y', 20)
+  }} />
+  const ground = (
+    <Box width={1000} depth={1000} height={1} y={-0.5} onDoubleClick={(x) => {
+      setBoxPos({ ...x.point, y: x.point.y + 0.5 })
+    }}>
+      <Material color={'green'} map={'./ground.jpeg'}>
+        <Field field='map'
+          wrapS={THREE.RepeatWrapping}
+          wrapT={THREE.RepeatWrapping}
+          repeat={{ x: 100, y: 100 }}>
+        </Field>
+      </Material>
+    </Box>)
+
   return (
     <World>
       <Container>
@@ -87,27 +99,50 @@ function App(props) {
           skybox={skyboxUrl}
         >
           {ground}
-          <AmbientLight></AmbientLight>
-          <Box
+          <Model
             {...boxPos}
+            src={'./Fox.fbx'}
+            {...{ scaleX: 0.01, scaleY: 0.01, scaleZ: 0.01 }}
+          >
+            <CSS2DObject ref={css2dRef} y={400} >
+              <div style={{ color: 'white' }} >{'('}{Math.round(boxPos.x)},{Math.round(boxPos.z)}{')'} </div>
+            </CSS2DObject>
+          </Model>
+          {/* todo model无法显示 */}
+          <Model
+            {...{ ...boxPos, x: boxPos.x + 5 }}
+            src={'./Walking.fbx'}
+            {...{ scaleX: 100, scaleY: 100, scaleZ: 100 }}
+          >
+            <CSS2DObject >
+              <div style={{ color: 'white' }} >Walking</div>
+            </CSS2DObject>
+          </Model>
+
+          <AmbientLight {...{ // 同步camera 位置
+            x: _.get(cameraRef.current, 'x', 5),
+            z: _.get(cameraRef.current, 'z', 20),
+            y: _.get(cameraRef.current, 'y', 20)
+          }}
+          ></AmbientLight>
+          <Box
+            y={2}
             ref={boxRef}>
             <Material ref={boxMaterialRef} map={'./top.webp'} side={THREE.DoubleSide}>
             </Material>
-            <CSS2DObject ref={css2dRef} y={1} >
-              <div style={{ color: 'white' }} >我是2d</div>
-            </CSS2DObject>
           </Box>
           <AxesHelper />
-          <Box x={2} z={2} visible={show}>
+          <Box x={2} z={2} y={0.5} visible={show}>
             <Material color={'yellow'}></Material>
           </Box>
-          <Sphere x={4} z={4} ref={earthRef}>
+          <Sphere x={4} z={4} y={2} ref={earthRef}>
             <Material
               map={'./earth.webp'}
               color={'rgba(127, 127, 127)'}
               side={THREE.DoubleSide}>
             </Material>
             <CSS2DObject y={1}>
+              {/* todo 2d无法点击 */}
               <div style={{ color: 'white' }} y={2}>地球</div>
             </CSS2DObject>
           </Sphere>
@@ -118,10 +153,8 @@ function App(props) {
           {
             colorConfigRef.current.map(item =>
               <CSS3DObject key={item.i} ref={item.ref} x={-3 * item.i} y={2 * item.i} z={-2} scaleX={0.01} scaleY={0.01}>
+                {/* todo 3d无法点击 */}
                 <div
-                  onClick={(el) => {
-                    console.log('3del', el)
-                  }}
                   style={{ color: item.c, width: 100, height: 100, background: item.bg, fontSize: 28 }}>
                   我是3d
                 </div>
@@ -138,6 +171,14 @@ function App(props) {
 }
 
 export default () => {
-  const { progress } = usePreload(['./top.webp', './earth.webp', skyboxUrl])
+  const { progress } = usePreload([
+    './top.webp',
+    './earth.webp',
+    skyboxUrl,
+    './ground.jpeg',
+    './Fox.fbx',
+    './Walking.fbx',
+    './Idle.fbx'
+  ])
   return progress === 1 && <App />
 }

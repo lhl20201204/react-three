@@ -1,4 +1,4 @@
-import PrimitiveParent from "./PrimitiveParent"
+import PrimitiveWrap from "./Wrap/PrimitiveWrap"
 let pid = 0;
 export default class PromiseWrap {
   constructor(config) {
@@ -16,7 +16,7 @@ export default class PromiseWrap {
       reject = rej
     })
     promise.then(value => {
-      if (value instanceof PrimitiveParent) {
+      if (value instanceof PrimitiveWrap) {
         value.setLevel(this.level)
       }
       this._value = value
@@ -75,5 +75,9 @@ export default class PromiseWrap {
   bindPromiseWrapRelation(level, parent) {
     this.level = level;
     this.parentPromiseResolve(parent)
+  }
+
+  _removeFromParent() {
+    // TODO
   }
 }

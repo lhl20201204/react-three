@@ -4,7 +4,7 @@ import { WithStore } from "../../core";
 import { OrbitControls as OrbitControls2 } from 'three/examples/jsm/controls/OrbitControls.js';
 import usePromiseWrap from "../../Hook/usePromiseWrap";
 import _constant from "../../constant";
-import { Wrap } from "../../ProxyInstance";
+import { WrapNode } from "../../ProxyInstance";
 
 const OrbitControls = function (props, ref) {
   usePromiseWrap(props, ref, {
@@ -18,7 +18,7 @@ const OrbitControls = function (props, ref) {
           throw new Error('<Container/>必须有 camera 和 pointerEvents不为none的renderer')
         }
         const control = new OrbitControls2(camera, renderer.domElement)
-        resolve(new Wrap(control, config))
+        resolve(new WrapNode(control, config))
       }
     })
   })

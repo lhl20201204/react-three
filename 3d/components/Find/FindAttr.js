@@ -4,7 +4,7 @@ import _constant from "../../constant";
 import { WithStore } from "../../core";
 import { _render } from "../../core/render";
 import usePromiseWrap from "../../Hook/usePromiseWrap";
-import PrimitiveParent from "../../ProxyInstance/PrimitiveParent";
+import { PrimitiveWrap } from "../../ProxyInstance";
 
 const FindAttr = function (props, ref) {
   usePromiseWrap(props, ref, {
@@ -20,8 +20,8 @@ const FindAttr = function (props, ref) {
           throw new Error('cb 属性必须是函数')
         }
         const ret = cb(node, config)
-        if (!(ret instanceof PrimitiveParent)) {
-          throw new Error('返回值必须 instanceof PrimitiveParent')
+        if (!(ret instanceof PrimitiveWrap)) {
+          throw new Error('返回值必须 instanceof PrimitiveWrap')
         }
         resolve(ret)
       }

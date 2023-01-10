@@ -3,7 +3,7 @@ import { getAst } from "./ast"
 import { findNode } from "./findNode"
 import * as THREE from "three";
 import PromiseWrap from "../ProxyInstance/PromiseWrap";
-
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
 class Store {
   mountedPromiseResolve = null
@@ -13,6 +13,7 @@ class Store {
   loadingManager = new THREE.LoadingManager()
   textureLoader = new THREE.TextureLoader(this.loadingManager)
   cubeTextureLoader = new THREE.CubeTextureLoader(this.loadingManager)
+  fbxLoader = new FBXLoader(this.loadingManager)
   _setTextureLoader = [this.textureLoader, this.cubeTextureLoader].map(
     x => x.setCrossOrigin('Anonymous')
   )
@@ -63,6 +64,17 @@ class Store {
       throw new Error('必须是PromiseWrap的实例')
     }
     this.promiseWrapList.push(p)
+  }
+
+  deletePromiseWrap(p) {
+    const len = this.promiseWrapList;
+    for (let i = 0; i < len; i++) {
+      if (this.promiseWrapList[i] === p) {
+        this.promiseWrapList.splice(i, 1)
+        return true
+      }
+    }
+    return false
   }
 
   async runPromiseWrapList() {
