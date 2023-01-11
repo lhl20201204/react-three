@@ -8,7 +8,7 @@ export default class PrimitiveNode{
     this.hadLoad = false;
     this.promiseWrap.promise.then(() => this.hadLoad = true)
     this.type = _.get(config, 'type')
-    this.props = _.get(config, 'props')
-    this.level = -1
+    this.props = _.omit(_.get(config, 'props'), ['children'])
+    this.userData = {}
   }
 }

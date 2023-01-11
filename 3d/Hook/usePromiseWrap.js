@@ -2,7 +2,7 @@ import _ from "lodash";
 import React, { useEffect, useRef } from "react";
 import _constant from "../constant";
 import { getStore } from "../core/store";
-import { PromiseWrap } from "../ProxyInstance";
+import { PrimitiveWrap, PromiseWrap } from "../ProxyInstance";
 
 const store = getStore()
 
@@ -19,7 +19,7 @@ export default function usePromiseWrap(props, ref, config) {
   useEffect(() => {
     const { promiseWrap } = configRef.current
     const { promise, resolve, reject } = promiseWrap
-    const { type, f, onPreLoad, onParentLoad, onChildrenLoad, onSiblingLoad } = config;
+    const { type, f, onPreLoad, onParentLoad, onChildrenLoad, onSiblingLoad, onDestroy } = config;
     if (ref) {
       if (!type) {
         throw new Error('no type')
@@ -33,7 +33,11 @@ export default function usePromiseWrap(props, ref, config) {
       ref.current = promiseWrap
 
       if (f) {
-        resolve(typeof f === 'function' ? f(configRef.current) : f)
+        const ret = typeof f === 'function' ? f(configRef.current) : f
+        if (!(ret instanceof PrimitiveWrap)) {
+          throw new Error('ret 必须 instanceof PrimitiveWrap')
+        }
+        resolve(ret)
       }
 
       if (onPreLoad) {
@@ -73,6 +77,7 @@ export default function usePromiseWrap(props, ref, config) {
         throw new Error('删除失败')
       }
       promiseWrap._removeFromParent()
+      onDestroy?.(promiseWrap)
     }
   }, [])
   return configRef

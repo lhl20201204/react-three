@@ -1,7 +1,6 @@
 import _ from "lodash"
-import { useEffect, useRef, useState } from "react"
+import { useEffect } from "react"
 import { _render } from "../core/render"
-import * as THREE from "three"
 import { getStore } from "../core/store"
 const store = getStore()
 
@@ -9,7 +8,7 @@ export function useLoop(fn, dev=[], option={}) {
   useEffect(() => {
     let raf = null
     let runFn = null
-    let clock = new THREE.Clock()
+    let clock = store.clock
     try {
       const step = (t = 0) => {
         fn({ clock, t })

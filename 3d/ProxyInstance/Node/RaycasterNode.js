@@ -25,7 +25,7 @@ export default class RaycasterNode extends PrimitiveNode {
     const uniqIntersects = _.uniqBy(intersects, x => x.object.uuid)
     if (uniqIntersects.length) {
       for (const x of uniqIntersects) {
-        x.object?.userData?.proxy?.props?.[type]?.(x)
+        x.object?.userData?.[type]?.(x)
       }
     }
   }

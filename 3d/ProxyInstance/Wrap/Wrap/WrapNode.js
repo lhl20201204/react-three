@@ -1,11 +1,16 @@
 import _ from "lodash"
 import PrimitiveWrap from "../PrimitiveWrap"
 
-class WrapNode extends PrimitiveWrap{
+class WrapNode extends PrimitiveWrap {
   constructor(node, config, option) {
     super(config)
     this.node = node
-    this.proxyData([['node', '']])
+    if (!node.userData) {
+      node.userData = {}
+    }
+    if (!option || !option.noRegisterAttr) {
+      this.proxyData([['node', '']])
+    }
     const selfAttr = [
       ...Reflect.ownKeys(this),
       ...Reflect.ownKeys(PrimitiveWrap.prototype),
@@ -18,7 +23,11 @@ class WrapNode extends PrimitiveWrap{
         if (selfAttr.includes(attr)) {
           _this[attr] = v
         } else {
-          change(_this.node, attr, v)
+          if (!Reflect.has(_this.node, attr)) {
+            Reflect.set(_this.node.userData, attr, v)
+          } else {
+            change(_this.node, attr, v)
+          }
         }
         return true
       },
@@ -30,7 +39,11 @@ class WrapNode extends PrimitiveWrap{
         if (selfAttr.includes(attr)) {
           _this[attr] = v
         } else {
-          Reflect.set(_this.node, attr, v)
+          if (!Reflect.has(_this.node, attr)) {
+            Reflect.set(_this.node.userData, attr, v)
+          } else {
+            Reflect.set(_this.node, attr, v)
+          }
         }
         return true
       },

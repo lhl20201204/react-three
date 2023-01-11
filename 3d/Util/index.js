@@ -14,3 +14,11 @@ export const mixColor = (arr1, arr2, r2) => {
   const f = (i) =>  Math.floor((arr1[i]) * (r1)+ (arr2[i]) * (r2))
   return `rgb(${f(0)},${f(1)},${f(2)})`
 }
+
+export const getScale = (x) => (
+  {
+    scaleX: x,
+    scaleY: x,
+    scaleZ: x,
+  }
+)

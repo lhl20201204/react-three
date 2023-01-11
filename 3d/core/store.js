@@ -4,19 +4,23 @@ import { findNode } from "./findNode"
 import * as THREE from "three";
 import PromiseWrap from "../ProxyInstance/PromiseWrap";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 class Store {
   mountedPromiseResolve = null
   mountedPromise = new Promise(resolve => {
     this.mountedPromiseResolve = resolve
   })
+  clock = new THREE.Clock()
   loadingManager = new THREE.LoadingManager()
   textureLoader = new THREE.TextureLoader(this.loadingManager)
   cubeTextureLoader = new THREE.CubeTextureLoader(this.loadingManager)
   fbxLoader = new FBXLoader(this.loadingManager)
+  gltfLoader = new GLTFLoader(this.loadingManager)
   _setTextureLoader = [this.textureLoader, this.cubeTextureLoader].map(
     x => x.setCrossOrigin('Anonymous')
   )
+  modelList = []
   watchDevList = []
   resourceMap = {}
   promiseWrapList = []
@@ -44,6 +48,21 @@ class Store {
     this.watchDevList.push(devConfig)
   }
 
+  pushModel(model) {
+    this.modelList.push(model)
+  }
+
+  deleteModel(model) {
+    const len = this.modelList.length;
+    for (let i = 0; i < len; i++) {
+      if (this.modelList[i] === model) {
+        this.modelList.splice(i, 1)
+        return true
+      }
+    }
+    return false
+  }
+
   runWatchDevList() {
     this.watchDevList.map(({ cb, filter }) => {
       if (typeof cb !== 'function') {
@@ -67,9 +86,10 @@ class Store {
   }
 
   deletePromiseWrap(p) {
-    const len = this.promiseWrapList;
+    const len = this.promiseWrapList.length;
     for (let i = 0; i < len; i++) {
-      if (this.promiseWrapList[i] === p) {
+      const cur = this.promiseWrapList[i]
+      if ([cur, cur.pid].includes(p)) {
         this.promiseWrapList.splice(i, 1)
         return true
       }

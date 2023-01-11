@@ -31,6 +31,7 @@ const _constant = {
   onParentMounted: 'value.current.onParentMounted',
   findAttr,
   funRef,
-  propsOmit: [findAttr, funRef, 'children', 'ref']
+  propsOmit: [findAttr, funRef, 'children', 'ref'],
+  mapAttrList: ['map'],
 }
 export default _constant

@@ -19,6 +19,7 @@ export default class PromiseWrap {
       if (value instanceof PrimitiveWrap) {
         value.setLevel(this.level)
       }
+      value.props?.onLoad?.(value)
       this._value = value
     })
     this.parentPromiseResolve = null

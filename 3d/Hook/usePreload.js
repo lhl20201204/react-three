@@ -17,6 +17,11 @@ const getLoader = (url) => {
   if (suffix.match(/fbx/)) {
     return 'fbxLoader'
   }
+
+  if (suffix.match(/glb/)) {
+    return 'gltfLoader'
+  }
+
 }
 
 export function usePreload(urlArr, config) {
@@ -24,8 +29,8 @@ export function usePreload(urlArr, config) {
   useEffect(() => {
     _.reduce(urlArr, (resourceMap, url) => {
       store[getLoader(url)].load(url, (obj) => {
-        resourceMap[Array.isArray(url) ? JSON.stringify(url) : url] = obj
-        config?.onLoad?.(url, obj)
+        const ret = config?.onLoad?.(url, obj)
+        resourceMap[Array.isArray(url) ? JSON.stringify(url) : url] = ret || obj
       })
       return resourceMap;
     }, store.resourceMap)

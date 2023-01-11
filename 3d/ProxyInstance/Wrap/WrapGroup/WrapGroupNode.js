@@ -1,13 +1,16 @@
 import _ from "lodash"
 import PrimitiveWrap from "../PrimitiveWrap"
 
-class WrapGroupNode extends PrimitiveWrap{
+class WrapGroupNode extends PrimitiveWrap {
   constructor(group, config, option) {
     super(config)
     this.group = group
     this.child = _.get(group, 'children.0')
-    this.child.userData.proxy = this
-    this.child.userData.type = _.get(config, 'type')
+    this.group.userData.__type__ = _.get(config, 'type')
+    this.group.userData.__proxy__ = this
+    this.child.userData.__type__ = _.get(config, 'type')
+    this.child.userData.__proxy__ = this
+
     this.proxyData()
     const selfAttr = [
       ...Reflect.ownKeys(this),
@@ -35,7 +38,11 @@ class WrapGroupNode extends PrimitiveWrap{
           _this[attr] = v
         } else {
           let value = v
-          Reflect.set(_this.child, attr, value)
+          if (Reflect.has(_this.child, attr)) {
+            Reflect.set(_this.child, attr, value)
+          } else {
+            Reflect.set(_this.child.userData, attr, value)
+          }
         }
         return true
       },
