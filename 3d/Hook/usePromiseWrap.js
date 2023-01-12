@@ -48,6 +48,7 @@ export default function usePromiseWrap(props, ref, config) {
         promiseWrap.parentPromise
           .then(p => p.promise)
           .then(onParentLoad({ resolve, reject, promise }, configRef.current))
+          .catch(console.error)
       }
 
       for (const { onload, attr } of [{
@@ -58,13 +59,18 @@ export default function usePromiseWrap(props, ref, config) {
         attr: 'siblingPromise',
       }]) {
         if (onload) {
-          const { cb, filter } = onload({ resolve, reject, promise }, configRef.current)
-          if (!cb) {
-            throw new Error('返回的对象必须要有cb属性')
+          try {
+            const { cb, filter } = onload({ resolve, reject, promise }, configRef.current)
+            if (!cb) {
+              throw new Error('返回的对象必须要有cb属性')
+            }
+            promiseWrap[attr]
+              .then(x => Promise.all((filter ? x.filter(filter) : x).map(x => x.promise)))
+              .then(cb)
+              .catch(console.error)
+          } catch (e) {
+            console.error(e)
           }
-          promiseWrap[attr]
-            .then(x => Promise.all((filter ? x.filter(filter) : x).map(x => x.promise)))
-            .then(cb)
         }
       }
 
@@ -73,7 +79,7 @@ export default function usePromiseWrap(props, ref, config) {
       promiseWrap.updateProps(_.omit(props, _constant.propsOmit))
     })
     return () => {
-      if(!store.deletePromiseWrap(promiseWrap)) {
+      if (!store.deletePromiseWrap(promiseWrap)) {
         throw new Error('删除失败')
       }
       promiseWrap._removeFromParent()

@@ -20,7 +20,7 @@ const Raycaster = function (props, ref) {
             _.get(props, 'near'),
             _.get(props, 'far'),
           )
-          resolve(new WrapSelfNode(new RaycasterNode(raycaster, {...config, res}), config))
+          resolve(new WrapSelfNode(new RaycasterNode(raycaster, { ...config, res }), config))
         }
       }
     },

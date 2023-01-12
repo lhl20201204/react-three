@@ -24,11 +24,11 @@ class Store {
   watchDevList = []
   resourceMap = {}
   promiseWrapList = []
-  camera = null
-  renderer = null
-  scene = null
-  control = null
-  container = null
+  camera = []
+  renderer = []
+  scene = []
+  control = []
+  container = []
   domElement = null
   isInWorld = false
   lastCountDicts = null
@@ -39,6 +39,7 @@ class Store {
   nodeStack = []
   nameStack = []
   tree = {}
+  promiseResultList = []
 
   setDomElement(x) {
     this.domElement = x;
@@ -97,8 +98,16 @@ class Store {
     return false
   }
 
-  async runPromiseWrapList() {
-    return Promise.all(this.promiseWrapList.map(x => x.promise))
+  runPromiseWrapList() {
+    return new Promise((resolve, reject) => {
+      Promise.all(this.promiseWrapList.map(x => x.promise)).then(res => {
+        this.promiseResultList = res;
+        resolve(res)
+      }).catch(e => {
+        console.error(e)
+        reject(e)
+      })
+    })
   }
 
   setCamera = (x) => {
@@ -121,24 +130,34 @@ class Store {
     this.container = x;
   }
 
-  async setNode(type, fn) {
-    const wrapList = await Promise.all(_.map(findNode({ type }, this.tree), x => _.get(x, _constant.promise, {})))
-    fn(wrapList.sort((a, b) => b.level - a.level).map(x => x.node))
+  setNode(type, fn) {
+    return new Promise((resolve, reject) => {
+      Promise.all(_.map(findNode({ type }, this.tree), x => _.get(x, _constant.promise, {})))
+        .then(wrapList => {
+          fn(wrapList.sort((a, b) => b.level - a.level).map(x => x.node))
+          resolve(wrapList)
+        }
+        ).catch(e => {
+          console.error(e)
+          reject(e)
+        })
+    })
   }
 
-  async updateContainer() {
+  updateContainer() {
     return Promise.all([
       [_constant.containerList, this.setContainer],
       [_constant.sceneList, this.setScene],
       [_constant.cameraList, this.setCamera],
       [_constant.rendererList, this.setRenderer],
       [_constant.controlList, this.setControl],
-    ].map(x => this.setNode(x[0], x[1])))
+    ].map(x => this.setNode(x[0], x[1])));
   }
 
   getHandleResize = () => {
+    const aspect = window.innerWidth / window.innerHeight
     for (const camera of this.camera) {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.aspect = aspect;
       camera.updateProjectionMatrix();
     }
 

@@ -6,7 +6,7 @@ let id = 0;
 const exclude = _constant.excludeList;
 export default class PrimitiveWrap {
   constructor(config) {
-    this.id = id++
+    this.pwId = id++
     if (!config.type || !config.promiseWrap || !config.props) {
       console.log(config)
       throw new Error('实例化失败')
@@ -28,6 +28,13 @@ export default class PrimitiveWrap {
     const child = this.group || this.node
     if (exclude.includes(this.type)) {
       return
+    }
+    if (_constant.grandAddList.includes(this.type)) {
+      const parentNode = _.get(parentAstItem, _constant.node, _.get(parentAstItem, _constant.group))
+      if (child && parentNode?.parent) {
+        parentNode.parent.add(child)
+        return
+      }
     }
     if (child && parentNode) {
       parentNode.add(child)

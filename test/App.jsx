@@ -1,6 +1,6 @@
 import _ from "lodash";
 import React from "react";
-import { usePreload, THREE } from "../3d";
+import { usePreload } from "../3d";
 import "./index.scss";
 import App1 from "./App1";
 import App2 from "./App2";
@@ -35,5 +35,5 @@ export default () => {
       }
     }
   })
-  return progress === 1 && <App1 />
+  return progress === 1 && <App3 />
 }

@@ -1,9 +1,7 @@
 import _ from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { Vector3 } from "three";
-import { Scene, AmbientLight, AxesHelper, Box, Container, CSS2DObject, CSS2DRenderer, CSS3DObject, CSS3DRenderer, Field, Material, mixColor, Model, OrbitControls, PerspectiveCamera, Raycaster, Sphere, THREE, TrackballControls, useLoop, usePreload, WebGLRenderer, World, getScale } from "../3d";
-import "./index.scss";
-
+import { Scene, AmbientLight, AxesHelper, Box, Container, CSS2DObject, CSS2DRenderer, CSS3DObject, CSS3DRenderer, Field, mixColor, Model, OrbitControls, PerspectiveCamera, Raycaster, Sphere, THREE, TrackballControls, useLoop, usePreload, WebGLRenderer, World, getScale, SkeletonHelper, HemisphereLight, DirectionalLight } from "../3d";
 const rand = x => Math.floor(Math.random() * x)
 const getC = () => `rgb(${rand(255)}, ${rand(255)}, ${rand(255)})`
 const skyboxUrl = [
@@ -14,8 +12,9 @@ const skyboxUrl = [
   './pz.png',
   './nz.png',
 ]
-
+let step = -1
 export default () => {
+  const foxRef = useRef()
   const soldierModelRef = useRef()
   const [show, setShow] = useState(0)
   const [boxPos, setBoxPos] = useState({ x: -2, y: 0.5, z: 0 })
@@ -63,9 +62,15 @@ export default () => {
     // camera.x = 2 * (sin - 0.5)
     // camera.y = 2 * (cos - 0.5)
     // camera.z = 20
-    // box.rotationX += 0.01
-    // box.rotationY += 0.01
-    solider.lookAt(new Vector3(-camera.x, 2, -camera.z))
+    box.rotationX += 0.01
+    box.rotationY += 0.01
+
+    if (solider.z < -10) {
+      step = 1
+    } else if (solider.z > 10) {
+      step = -1
+    }
+    solider.z += 0.1 * step
     boxMaterial.color = mixColor([125, 125, 125], [0, 255, 255], Math.abs(sin / 3))
     css3d.rotationY += 0.01
     css3d2.rotationY += 0.02
@@ -82,14 +87,14 @@ export default () => {
   const ground = (
     <Box width={1000} depth={1000} height={1} y={-0.5} onDoubleClick={(x) => {
       setBoxPos({ ...x.point, y: x.point.y + 0.5 })
-    }}>
-      <Material color={'green'} map={'./ground.jpeg'} x={1}>
-        <Field field='map'
-          wrapS={THREE.RepeatWrapping}
-          wrapT={THREE.RepeatWrapping}
-          repeat={{ x: 100, y: 100 }}>
-        </Field>
-      </Material>
+    }}
+      map={'./ground.jpeg'}
+    >
+      <Field field='material.map'
+        wrapS={THREE.RepeatWrapping}
+        wrapT={THREE.RepeatWrapping}
+        repeat={{ x: 100, y: 100 }}>
+      </Field>
     </Box>)
 
   return (
@@ -103,20 +108,42 @@ export default () => {
         <Scene
           skybox={skyboxUrl}
         >
+          <Box x={2} z={2} y={0.5} color={'blue'} visible={show === 1}>
+          </Box>
+          <HemisphereLight y={20} />
+          <DirectionalLight x={-3} y={10} z={-10} castShadow={true} >
+            <Field field="shadow.camera"
+              top={4}
+              bottom={-4}
+              left={4}
+              right={-4}
+              near={0.1}
+              far={40}
+            >
+            </Field>
+          </DirectionalLight>
           {ground}
           <Model
+            uid="soldier"
             {...getScale(4)}
             ref={soldierModelRef}
             src='./Soldier.glb'
-            action={['Idle', 'Run', 'Walk'][show]}
-            x={-5}
-            z={5}
+            action={['Idle', 'Walk', 'Run'][show]}
+            lookAt={new Vector3(foxRef.current?.x ?? 0, 0, foxRef.current?.z ?? 0)}
+            {...{ // 初次为默认值，后续为control的移动值
+              x: _.get(soldierModelRef.current, 'x', -5),
+              z: _.get(soldierModelRef.current, 'z', 5),
+              y: _.get(soldierModelRef.current, 'y', 0)
+            }}
           >
+            <SkeletonHelper></SkeletonHelper>
           </Model>
+
           <Model
             {...boxPos}
             src={'./Fox.fbx'}
             {...getScale(1 / 100)}
+            ref={foxRef}
           >
             <CSS2DObject ref={css2dRef} y={400} >
               <div style={{ color: 'white' }} >{'('}{Math.round(boxPos.x)},{Math.round(boxPos.z)}{')'} </div>
@@ -140,21 +167,24 @@ export default () => {
           }}
           ></AmbientLight>
           <Box
+            // width={100}
+            // height={100}
+            // depth={100}
             y={2}
-            ref={boxRef}>
-            <Material ref={boxMaterialRef} map={'./top.webp'} side={THREE.DoubleSide}>
-            </Material>
+            ref={boxRef}
+            map={'./top.webp'}
+            >
+            <Field field="material" ref={boxMaterialRef} 
+            side={THREE.DoubleSide}
+            >
+            </Field>
           </Box>
           <AxesHelper />
-          <Box x={2} z={2} y={0.5} visible={show === 1}>
-            <Material color={'yellow'}></Material>
-          </Box>
-          <Sphere x={4} z={4} y={2} ref={earthRef}>
-            <Material
-              map={'./earth.webp'}
-              color={'rgba(127, 127, 127)'}
-              side={THREE.DoubleSide}>
-            </Material>
+          <Sphere x={4} z={4} y={2} ref={earthRef} map={'./earth.webp'} color={'rgba(127, 127, 127)'}>
+          <Field field="material" 
+            side={THREE.DoubleSide}
+            >
+            </Field>
             <CSS2DObject y={1}>
               {/* todo 2d无法点击 */}
               <div style={{ color: 'white' }} y={2}>地球</div>

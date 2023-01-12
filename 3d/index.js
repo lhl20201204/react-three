@@ -6,7 +6,7 @@ import { WebGLRenderer,CSS2DRenderer, CSS3DRenderer } from "./components/Rendere
 import Box from "./components/Object3d/Box";
 import Sphere from "./components/Object3d/Sphere";
 import { useLoop } from "./Hook/useLoop";
-import { Field, FindAttr, Material } from "./components/Find"
+import { Field, FindAttr } from "./components/Find"
 import { getScale, mixColor } from "./Util";
 import AmbientLight from "./components/Light/AmbientLight";
 import { CSS2DObject, CSS3DObject } from "./components/CSSObject";
@@ -18,6 +18,7 @@ import { Raycaster } from "./components/Raycaster";
 import { Model } from "./components/Model";
 import { DirectionalLight, HemisphereLight } from "./components/Light";
 import Plane from "./components/Object3d/Plane";
+import SkeletonHelper from "./components/Helper/SkeletonHelper";
 
 export  {
   THREE,
@@ -27,7 +28,6 @@ export  {
   WebGLRenderer,
   Box,
   FindAttr,
-  Material,
   AmbientLight,
   Sphere,
   CSS2DRenderer,
@@ -44,6 +44,7 @@ export  {
   HemisphereLight,
   DirectionalLight,
   Plane,
+  SkeletonHelper,
   usePreload,
   useLoop,
   mixColor,

@@ -19,8 +19,8 @@ export default class PromiseWrap {
       if (value instanceof PrimitiveWrap) {
         value.setLevel(this.level)
       }
+      this._value = value 
       value.props?.onLoad?.(value)
-      this._value = value
     })
     this.parentPromiseResolve = null
     this._parent = null
@@ -73,7 +73,7 @@ export default class PromiseWrap {
     })
   }
 
-  bindPromiseWrapRelation(level, parent) {
+  _addToParent(level, parent) {
     this.level = level;
     this.parentPromiseResolve(parent)
   }

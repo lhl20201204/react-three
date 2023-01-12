@@ -1,4 +1,3 @@
-const findAttr = 'attr'
 const funRef = '__funRef'
 const containerList = ['Container']
 const sceneList = ['Scene']
@@ -7,6 +6,9 @@ const rendererList = ['WebGLRenderer', 'CSS2DRenderer', 'CSS3DRenderer']
 const controlList = ['OrbitControls', 'TrackballControls']
 const findAttrList = ['FindAttr']
 const raycasterList = ['Raycaster']
+const __proxy__ = '$$__proxy__'
+const __type__ = '$$__type__'
+
 const _constant = {
   cameraList,
   rendererList,
@@ -24,14 +26,21 @@ const _constant = {
     ...findAttrList,
     ...raycasterList,
   ],
+  excludeAttrList: [
+    __proxy__,
+    __type__,
+  ],
+  grandAddList: ['SkeletonHelper'],
   promise: 'value.current.promise',
   node: 'value.current.node',
   group: 'value.current.group',
   child: 'value.current.child',
   onParentMounted: 'value.current.onParentMounted',
-  findAttr,
   funRef,
-  propsOmit: [findAttr, funRef, 'children', 'ref'],
+  propsOmit: [funRef, __proxy__, __type__, 'children', 'ref'],
   mapAttrList: ['map'],
+  colorAttrList: ['color'],
+  __proxy__,
+  __type__,
 }
 export default _constant

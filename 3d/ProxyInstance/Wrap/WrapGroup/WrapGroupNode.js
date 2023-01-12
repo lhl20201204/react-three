@@ -1,4 +1,6 @@
 import _ from "lodash"
+import _constant from "../../../constant"
+import { getValue, setColor, setResource, setValue, useMiddleWare } from "../../../MiddleWare"
 import PrimitiveWrap from "../PrimitiveWrap"
 
 class WrapGroupNode extends PrimitiveWrap {
@@ -6,51 +8,45 @@ class WrapGroupNode extends PrimitiveWrap {
     super(config)
     this.group = group
     this.child = _.get(group, 'children.0')
-    this.group.userData.__type__ = _.get(config, 'type')
-    this.group.userData.__proxy__ = this
-    this.child.userData.__type__ = _.get(config, 'type')
-    this.child.userData.__proxy__ = this
+    this.group.userData[_constant.__type__] = _.get(config, 'type') + '_of_Group'
+    this.group.userData[_constant.__proxy__] = this
+    this.child.userData[_constant.__type__] = _.get(config, 'type')
+    this.child.userData[_constant.__proxy__] = this
 
     this.proxyData()
-    const selfAttr = [
+    const selfAttr = _.uniq([
       ...Reflect.ownKeys(this),
       ...Reflect.ownKeys(PrimitiveWrap.prototype),
-      ..._.get(option, 'selfAttr', [])
-    ]
-    const change = option?.change
-    const require = option?.require
+      ..._.get(option, 'selfAttr', []),
+      ..._constant.excludeAttrList,
+    ])
 
-    const ret = (change && require) ? new Proxy(this, {
+    const attrList = _.uniq([...(option?.proxyAttrList ? option.proxyAttrList : []),
+     ..._constant.colorAttrList,
+     ..._constant.mapAttrList
+    ])
+    const defaultSetMiddleWare = [setColor('child.material'), setResource('child.material')]
+    const defaultGetMiddleWare = []
+   
+    const change = useMiddleWare([...(option?.setMiddleWare ? option.setMiddleWare : []), ...defaultSetMiddleWare], setValue('child'))
+    const require = useMiddleWare([...(option?.getMiddleWare ? option.getMiddleWare : []), ...defaultGetMiddleWare], getValue('child'))
+    return new Proxy(this, {
       set(_this, attr, v) {
         if (selfAttr.includes(attr)) {
           _this[attr] = v
         } else {
-          change(_this, attr, v)
+          if ((!Reflect.has(_this.child, attr) && !Reflect.has(_this.group, attr)) && !attrList.includes(attr)) {
+            Reflect.set(_this.child.userData, attr, v)
+          } else {
+            change(_this, attr, v)
+          }
         }
         return true
       },
       get(_this, attr) {
         return selfAttr.includes(attr) ? _this[attr] : require(_this, attr)
       }
-    }) : new Proxy(this, {
-      set(_this, attr, v) {
-        if (selfAttr.includes(attr)) {
-          _this[attr] = v
-        } else {
-          let value = v
-          if (Reflect.has(_this.child, attr)) {
-            Reflect.set(_this.child, attr, value)
-          } else {
-            Reflect.set(_this.child.userData, attr, value)
-          }
-        }
-        return true
-      },
-      get(_this, attr) {
-        return selfAttr.includes(attr) ? _this[attr] : _this.child[attr]
-      }
     })
-    return ret
   }
 
 }

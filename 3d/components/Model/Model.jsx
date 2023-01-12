@@ -2,7 +2,6 @@ import _ from "lodash";
 import React, { useEffect, useRef } from "react";
 import * as THREE from 'three';
 import { WithStore } from "../../core";
-import { getGroupResolve } from "../../core/resolveValue";
 import { getStore } from "../../core/store";
 import usePromiseWrap from "../../Hook/usePromiseWrap";
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
@@ -29,7 +28,7 @@ const Model = function (props, ref) {
       const selectedAction = _.get(props, 'action', 0)
       let i = 0;
       for (const ca of object.animations) {
-        const action = mixer.clipAction(ca); 
+        const action = mixer.clipAction(ca);
         actions.push({
           i,
           name: ca.name,
@@ -40,7 +39,6 @@ const Model = function (props, ref) {
         }
         i++;
       }
-      console.log(actions);
       actionsRef.current = actions;
       const instance = new ModelNode({ model, mixer, actions }, config)
       store.pushModel(instance)
@@ -48,19 +46,18 @@ const Model = function (props, ref) {
       return new WrapModelNode(group, { ...config, instance });
     },
     onDestroy(promiseWrap) {
-      console.log('移除mixer', promiseWrap?.instance)
       store.deleteModel(promiseWrap?.instance)
       actionsRef.current = []
       actionRef.current?.stop?.()
     }
   })
 
-  useEffect(()=> {
+  useEffect(() => {
     const seletedAction = props.action
     if (!_.isNil(seletedAction)) {
       const lsa = actionRef.current
       lsa.stop?.()
-      for(const { i, name, action } of actionsRef.current) {
+      for (const { i, name, action } of actionsRef.current) {
         if ([i, name].includes(seletedAction)) {
           actionRef.current = action;
           action.play()

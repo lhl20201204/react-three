@@ -10,13 +10,17 @@ const PerspectiveCamera = function (props, ref) {
     type: 'PerspectiveCamera',
     f: getResolve(() => {
       const camera = new THREE.PerspectiveCamera(
-      _.get(props, 'fov', 45),
-      _.get(props, 'aspect', (window.innerWidth / window.innerHeight)),
-      _.get(props, 'near', 0.1),
-      _.get(props, 'far', 2000)
-    )
-    return camera
-  })
+        _.get(props, 'fov', 45),
+        _.get(props, 'aspect', (window.innerWidth / window.innerHeight)),
+        _.get(props, 'near', 0.1),
+        _.get(props, 'far', 2000)
+      )
+      camera.lookAt(0, 0, 0)
+      let ori = new THREE.Vector3();
+      camera.getWorldDirection(ori)
+      console.log('摄像机朝向', ori)
+      return camera
+    })
   })
   return props.children
 }

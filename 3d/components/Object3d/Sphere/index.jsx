@@ -15,9 +15,7 @@ const Sphere = function (props, ref) {
       _.get(props, 'phiLength', Math.PI * 2),
       _.get(props, 'thetaStart', 0),
       _.get(props, 'thetaLength', Math.PI),
-    ), new THREE[_.get(props, 'materialType', 'MeshBasicMaterial')]({
-      color: _.get(props, 'color', 'red')
-    })))
+    ), new THREE[_.get(props, 'materialType', 'MeshBasicMaterial')]()))
   })
   return props.children
 }

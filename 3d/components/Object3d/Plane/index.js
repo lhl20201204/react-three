@@ -14,7 +14,6 @@ const Plane = function (props, ref) {
       _.get(props, 'widthSegments', 1),
       _.get(props, 'heightSegments', 1),
     ), new THREE[_.get(props, 'materialType', 'MeshBasicMaterial')]({
-      color: _.get(props, 'color', 'red')
     }))),
   })
   return props.children

@@ -37,7 +37,7 @@ export function getAst(pre, suf) {
   const transform = (a, level = 1, parent = null) => {
     const { current } = dict[a.name].value
     if ((current instanceof PromiseWrap)) {
-      current.bindPromiseWrapRelation(level, parent)
+      current._addToParent(level, parent)
       const childrenPromiseWrap = a.children.map(c => dict[c.name].value.current)
       current.childrenPromiseResolve(childrenPromiseWrap)
       childrenPromiseWrap.map(pw => {
