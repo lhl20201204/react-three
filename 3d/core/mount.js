@@ -8,7 +8,6 @@ const store = getStore()
 
 export function mount() {
   try {
-    // console.log(store.tree)
     store.mountedPromiseResolve()
       ; (async () => {
         store.runWatchDevList()

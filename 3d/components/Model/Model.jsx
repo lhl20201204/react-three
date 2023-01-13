@@ -23,10 +23,21 @@ const Model = function (props, ref) {
       const model = SkeletonUtils.clone(object.scene || object);
       const mixer = new THREE.AnimationMixer(model);
       const onAnimationsLoad = _.get(props, 'onAnimationsLoad');
+      const animations = _.get(props, 'animations') || {}
+      let i = 0;
+      for(const aname in animations ) {
+         const obj = store.resourceMap[animations[aname]]
+         if (!obj) {
+          throw new Error('资源必须先预加载')
+        }
+         object.animations.push(...obj.animations.map((x, j) => ({
+          ...x,
+          name: aname + (j  ? j : '')
+         })))
+      }
       onAnimationsLoad?.(object.animations);
       const actions = []
       const selectedAction = _.get(props, 'action', 0)
-      let i = 0;
       for (const ca of object.animations) {
         const action = mixer.clipAction(ca);
         actions.push({
@@ -46,7 +57,9 @@ const Model = function (props, ref) {
       return new WrapModelNode(group, { ...config, instance });
     },
     onDestroy(promiseWrap) {
-      store.deleteModel(promiseWrap?.instance)
+      if (! store.deleteModel(promiseWrap?.instance)) {
+        throw new Error('删除失败')
+      }
       actionsRef.current = []
       actionRef.current?.stop?.()
     }

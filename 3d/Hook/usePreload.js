@@ -30,7 +30,11 @@ export function usePreload(urlArr, config) {
     _.reduce(urlArr, (resourceMap, url) => {
       store[getLoader(url)].load(url, (obj) => {
         const ret = config?.onLoad?.(url, obj)
-        resourceMap[Array.isArray(url) ? JSON.stringify(url) : url] = ret || obj
+        const key = Array.isArray(url) ? JSON.stringify(url) : url
+        if (Reflect.has(resourceMap, key)) {
+          throw new Error('资源重复加载')
+        }
+        resourceMap[key] = ret || obj
       })
       return resourceMap;
     }, store.resourceMap)

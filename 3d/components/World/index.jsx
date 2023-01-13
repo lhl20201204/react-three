@@ -24,6 +24,7 @@ function World(props, ref) {
     window.addEventListener('resize', fn)
     return () => {
       window.removeEventListener('resize', fn)
+      store.destroy()
     }
   }, [])
 

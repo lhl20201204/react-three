@@ -6,6 +6,7 @@ import FindAttr from "./FindAttr"
 
 export default React.forwardRef((props, ref) => {
   return (<FindAttr
+    customize={props.customize}
     ref={ref}
     cb={(node, config) => {
       const value = _.get(node, _.get(props, 'field'))

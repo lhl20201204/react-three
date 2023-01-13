@@ -12,13 +12,9 @@ export default class ContainerNode extends PrimitiveNode {
   }
 
   render() {
-    try {
-      this.control?.update?.()
-      for (const renderer of this.renderer) {
-        renderer.render(this.scene, this.camera)
-      }
-    } catch (e) {
-      console.error(e)
+    this.control?.update?.()
+    for (const renderer of this.renderer) {
+      renderer.render(this.scene, this.camera)
     }
   }
 }

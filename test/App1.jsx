@@ -138,28 +138,22 @@ export default () => {
           >
             <SkeletonHelper></SkeletonHelper>
           </Model>
-
           <Model
             {...boxPos}
             src={'./Fox.fbx'}
             {...getScale(1 / 100)}
             ref={foxRef}
+            animations={{ idle: "./Idle.fbx", walking: "./Walking.fbx", soldier: './Soldier.glb' }}
+            action="walking"
+          // rotationX={-Math.PI / 2}
           >
+            <SkeletonHelper></SkeletonHelper>
             <CSS2DObject ref={css2dRef} y={400} >
-              <div style={{ color: 'white' }} >{'('}{Math.round(boxPos.x)},{Math.round(boxPos.z)}{')'} </div>
+              <div style={{ color: 'white', textAlign: 'center' }} >
+                双击改变站位<br />
+                {'('}{Math.round(boxPos.x)},{Math.round(boxPos.z)}{')'} </div>
             </CSS2DObject>
           </Model>
-          {/* todo model无法显示 */}
-          {/* <Model
-            {...{ ...boxPos, x: boxPos.x + 5 }}
-            src={'./Walking.fbx'}
-            {...getScale(4)}
-          >
-            <CSS2DObject >
-              <div style={{ color: 'white' }} >Walking</div>
-            </CSS2DObject>
-          </Model> */}
-
           <AmbientLight {...{ // 同步camera 位置
             x: _.get(cameraRef.current, 'x', 5),
             z: _.get(cameraRef.current, 'z', 20),
@@ -167,22 +161,19 @@ export default () => {
           }}
           ></AmbientLight>
           <Box
-            // width={100}
-            // height={100}
-            // depth={100}
             y={2}
             ref={boxRef}
             map={'./top.webp'}
-            >
-            <Field field="material" ref={boxMaterialRef} 
-            side={THREE.DoubleSide}
+          >
+            <Field field="material" ref={boxMaterialRef}
+              side={THREE.DoubleSide}
             >
             </Field>
           </Box>
           <AxesHelper />
           <Sphere x={4} z={4} y={2} ref={earthRef} map={'./earth.webp'} color={'rgba(127, 127, 127)'}>
-          <Field field="material" 
-            side={THREE.DoubleSide}
+            <Field field="material"
+              side={THREE.DoubleSide}
             >
             </Field>
             <CSS2DObject y={1}>

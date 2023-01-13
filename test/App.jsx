@@ -1,5 +1,5 @@
 import _ from "lodash";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { usePreload } from "../3d";
 import "./index.scss";
 import App1 from "./App1";
@@ -13,6 +13,7 @@ const skyboxUrl = [
   './pz.png',
   './nz.png',
 ]
+const Comps = [App1, App2, App3]
 
 export default () => {
   const { progress } = usePreload([
@@ -23,7 +24,8 @@ export default () => {
     './Fox.fbx',
     './Walking.fbx',
     './Idle.fbx',
-    './Soldier.glb'
+    './Soldier.glb',
+    './Grassland.glb'
   ], {
     onLoad(url, res) {
       if (['./Soldier.glb'].includes(url)) {
@@ -35,5 +37,16 @@ export default () => {
       }
     }
   })
-  return progress === 1 && <App3 />
+
+  const [id, setId] = useState(3)
+  useEffect(() => {
+    // const len = Comps.length
+    // for(let i = 0; i < len; i++) {
+    //   setTimeout(() => {
+    //     setId((i + 1) % len)
+    //   }, 3000 * (i + 1))
+    // }
+  }, [])
+  const Comp =Comps[id - 1]
+  return progress === 1 && <Comp />
 }

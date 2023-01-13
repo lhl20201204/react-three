@@ -20,7 +20,11 @@ const CSS2DRenderer = function (props, ref) {
       }
       document.body.appendChild(renderer.domElement);
       return renderer
-    })
+    }),
+    onDestroy(promiseWrap) {
+      const renderer =  promiseWrap.node;
+      document.body.removeChild(renderer.domElement);
+    }
   })
   return props.children
 }

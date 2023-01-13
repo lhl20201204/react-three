@@ -13,9 +13,7 @@ export default () => {
         <Field field='shadowMap' enabled={true} >
         </Field>
       </WebGLRenderer>
-      <PerspectiveCamera x={2} y={3} z={-6}
-        // lookAt={new THREE.Vector3(0, 1, 0)}
-      />
+      <PerspectiveCamera x={2} y={3} z={-6}  />
       <Scene
         fog={new THREE.Fog(0xa0a0a0, 10, 50)}
         background={new THREE.Color(0xa0a0a0)}
@@ -51,6 +49,10 @@ export default () => {
             action={action}
             x={(i - 1) * 2}
           >
+            <Field customize field="instance" onLoad={(x) => {
+              console.log(x)
+            }}>
+            </Field>
             <SkeletonHelper>
             </SkeletonHelper>
           </Model>)

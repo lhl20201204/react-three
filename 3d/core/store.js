@@ -5,7 +5,7 @@ import * as THREE from "three";
 import PromiseWrap from "../ProxyInstance/PromiseWrap";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 class Store {
   mountedPromiseResolve = null
   mountedPromise = new Promise(resolve => {
@@ -17,9 +17,15 @@ class Store {
   cubeTextureLoader = new THREE.CubeTextureLoader(this.loadingManager)
   fbxLoader = new FBXLoader(this.loadingManager)
   gltfLoader = new GLTFLoader(this.loadingManager)
-  _setTextureLoader = [this.textureLoader, this.cubeTextureLoader].map(
-    x => x.setCrossOrigin('Anonymous')
-  )
+  dracoLoader = new DRACOLoader();
+  _selfRun = (() => {
+    this.dracoLoader.setDecoderPath('/draco/');
+    this.dracoLoader.setDecoderConfig({ type: "js" });
+    this.gltfLoader.setDRACOLoader( this.dracoLoader);
+    [this.textureLoader, this.cubeTextureLoader].map(
+      x => x.setCrossOrigin('Anonymous')
+    );
+  })();
   modelList = []
   watchDevList = []
   resourceMap = {}
@@ -69,7 +75,7 @@ class Store {
       if (typeof cb !== 'function') {
         throw new Error('cb 必须是函数')
       }
-      if (filter && typeof filter !== 'function') {
+      if (filter && (typeof filter !== 'function')) {
         throw new Error(' 如果传了filter 其必须是函数')
       }
       const promiseWrapList = filter ? this.promiseWrapList.filter(filter) : this.promiseWrapList
@@ -180,6 +186,11 @@ class Store {
     this.nodeStack = []
     this.countDicts = {}
     this.isInWorld = false
+  }
+
+  destroy() {
+    this.lastTree = null
+    this.mountedPromise = new Promise(r => this.mountedPromiseResolve = r)
   }
 
   pushNode(x) {

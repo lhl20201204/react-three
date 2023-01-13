@@ -10,6 +10,7 @@ const OrbitControls = function (props, ref) {
   usePromiseWrap(props, ref, {
     type: 'OrbitControls',
     onSiblingLoad: ({ resolve }, config) => ({
+      filter: x => !_constant.controlList.includes(x.type),
       cb: (res) => {
         const camera = _.get(_.find(res, x => _constant.cameraList.includes(x.type)), 'node')
         const renderers = _.map(_.filter(res, x => _constant.rendererList.includes(x.type)), x => _.get(x, 'node'))

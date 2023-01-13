@@ -16,9 +16,6 @@ const PerspectiveCamera = function (props, ref) {
         _.get(props, 'far', 2000)
       )
       camera.lookAt(0, 0, 0)
-      let ori = new THREE.Vector3();
-      camera.getWorldDirection(ori)
-      console.log('摄像机朝向', ori)
       return camera
     })
   })

@@ -11,7 +11,7 @@ const FindAttr = function (props, ref) {
     type: 'FindAttr',
     onParentLoad({resolve}, config) {
       return (res) => {
-        const node = _.get(res, 'node', _.get(res, 'child'))
+        const node = props.customize ? res : _.get(res, 'node', _.get(res, 'child')) 
         if (!_.has(props, 'cb')){
           throw new Error(`必须传cb`)
         }
