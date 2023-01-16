@@ -49,10 +49,6 @@ export default () => {
             action={action}
             x={(i - 1) * 2}
           >
-            <Field customize field="instance" onLoad={(x) => {
-              console.log(x)
-            }}>
-            </Field>
             <SkeletonHelper>
             </SkeletonHelper>
           </Model>)

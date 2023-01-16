@@ -3,15 +3,15 @@ import _constant from "../constant";
 import { getStore } from "./store";
 const store = getStore()
 export function _render() {
-  try {
-    for (const container of store.container) {
-      container.render()
-    }
-    const dela = store.clock.getDelta()
-    for (const model of store.modelList) {
-      model.mixer.update(dela)
-    }
-  } catch (e) {
-    console.error(e)
+  for (const container of store.container) {
+    container.render()
+  }
+  const dela = store.clock.getDelta()
+  for (const model of store.modelList) {
+    model.mixer.update(dela)
+  }
+  const time = { clock: store.clock }
+  for(const subscribe of store.subscribeList) {
+    subscribe.cb(time, subscribe._owner, subscribe.watch.map(uid => store.uidMap[uid]))
   }
 }

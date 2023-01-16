@@ -1,52 +1,24 @@
-import World from "./components/World";
-import { Scene } from "./components/Scene";
 import * as THREE from "three"
-import { PerspectiveCamera } from "./components/Camera";
-import { WebGLRenderer,CSS2DRenderer, CSS3DRenderer } from "./components/Renderer";
-import Box from "./components/Object3d/Box";
-import Sphere from "./components/Object3d/Sphere";
+import World from "./components/World";
 import { useLoop } from "./Hook/useLoop";
-import { Field, FindAttr } from "./components/Find"
-import { getScale, mixColor } from "./Util";
-import AmbientLight from "./components/Light/AmbientLight";
-import { CSS2DObject, CSS3DObject } from "./components/CSSObject";
-import { OrbitControls, TrackballControls } from "./components/Control"
 import { usePreload } from "./Hook/usePreload";
-import { Container } from "./components/Container";
-import { AxesHelper } from "./components/Helper";
-import { Raycaster } from "./components/Raycaster";
-import { Model } from "./components/Model";
-import { DirectionalLight, HemisphereLight } from "./components/Light";
-import Plane from "./components/Object3d/Plane";
-import SkeletonHelper from "./components/Helper/SkeletonHelper";
+export * from "./components/Camera";
+export * from "./components/Renderer";
+export * from "./components/Scene";
+export * from "./components/Find"
+export * from "./Util";
+export * from "./components/CSSObject";
+export *  from "./components/Control"
+export * from "./components/Container";
+export * from "./components/Helper";
+export * from "./components/Raycaster";
+export * from "./components/Model";
+export * from "./components/Light";
+export * from "./components/Object3d"
 
 export  {
   THREE,
   World,
-  Scene,
-  PerspectiveCamera,
-  WebGLRenderer,
-  Box,
-  FindAttr,
-  AmbientLight,
-  Sphere,
-  CSS2DRenderer,
-  CSS2DObject,
-  OrbitControls,
-  CSS3DObject,
-  CSS3DRenderer,
-  Container,
-  TrackballControls,
-  AxesHelper,
-  Raycaster,
-  Field,
-  Model,
-  HemisphereLight,
-  DirectionalLight,
-  Plane,
-  SkeletonHelper,
   usePreload,
   useLoop,
-  mixColor,
-  getScale,
 }

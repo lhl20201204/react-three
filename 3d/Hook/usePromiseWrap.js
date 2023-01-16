@@ -17,7 +17,7 @@ export default function usePromiseWrap(props, ref, config) {
     })()),
   })
   useEffect(() => {
-    const { promiseWrap } = configRef.current
+    let { promiseWrap } = configRef.current
     const { promise, resolve, reject } = promiseWrap
     const { type, f, onPreLoad, onParentLoad, onChildrenLoad, onSiblingLoad, onDestroy } = config;
     if (ref) {
@@ -75,15 +75,47 @@ export default function usePromiseWrap(props, ref, config) {
       }
 
     }
+    const uid = props.uid
     promise.then(() => {
       promiseWrap.updateProps(_.omit(props, _constant.propsOmit))
+      if (uid) {
+        store.setUidMap(uid, promiseWrap)
+      }
     })
+    let subscribe = props.subscribe || null
+    let onUpdate = props.onUpdate || null
+    if (subscribe) {
+      if(!subscribe.cb) {
+        throw new Error('subscribe 必须 要有cb属性')
+      }
+      let watch = subscribe.watch
+      if (!watch) {
+        subscribe.watch = []
+      } else if (!Array.isArray(watch)) {
+        subscribe.watch = [watch]
+      }
+      subscribe._owner = promiseWrap;
+      store.pushSubScribe(subscribe)
+      // console.log(store.subscribeList)
+    } else if (typeof onUpdate === 'function') {
+      subscribe = {
+        watch: [],
+        cb: (x, _this, ...rest) => onUpdate(_this, x, ...rest),
+        _owner: promiseWrap
+      }
+      store.pushSubScribe(subscribe)
+    }
     return () => {
-      if (!store.deletePromiseWrap(promiseWrap)) {
+      if (!store.deletePromiseWrap(promiseWrap) || (subscribe && !store.deleteSubScribe(subscribe))) {
         throw new Error('删除失败')
+      }
+      if (uid) {
+        store.deleteFromUidMap(uid)
       }
       promiseWrap._removeFromParent()
       onDestroy?.(promiseWrap)
+      subscribe = null
+      promiseWrap = null
     }
   }, [])
   return configRef

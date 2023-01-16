@@ -5,6 +5,7 @@ import "./index.scss";
 import App1 from "./App1";
 import App2 from "./App2";
 import App3 from "./App3";
+import App4 from "./App4";
 const skyboxUrl = [
   './px.png',
   './nx.png',
@@ -13,7 +14,7 @@ const skyboxUrl = [
   './pz.png',
   './nz.png',
 ]
-const Comps = [App1, App2, App3]
+const Comps = [App1, App2, App3, App4]
 
 export default () => {
   const { progress } = usePreload([
@@ -25,7 +26,8 @@ export default () => {
     './Walking.fbx',
     './Idle.fbx',
     './Soldier.glb',
-    './Grassland.glb'
+    './Grassland.glb',
+    './collision-world.glb'
   ], {
     onLoad(url, res) {
       if (['./Soldier.glb'].includes(url)) {
@@ -34,18 +36,18 @@ export default () => {
             object.castShadow = true;
           }
         })
-      }
+      } 
     }
   })
 
-  const [id, setId] = useState(3)
+  const [id, setId] = useState(1)
   useEffect(() => {
-    // const len = Comps.length
-    // for(let i = 0; i < len; i++) {
-    //   setTimeout(() => {
-    //     setId((i + 1) % len)
-    //   }, 3000 * (i + 1))
-    // }
+    const len = Comps.length
+    for(let i = 0; i < len; i++) {
+      setTimeout(() => {
+        setId(((id + i + 1)% len) || len )
+      }, 3000 * (i + 1))
+    }
   }, [])
   const Comp =Comps[id - 1]
   return progress === 1 && <Comp />

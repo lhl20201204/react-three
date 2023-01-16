@@ -21,11 +21,13 @@ class Store {
   _selfRun = (() => {
     this.dracoLoader.setDecoderPath('/draco/');
     this.dracoLoader.setDecoderConfig({ type: "js" });
-    this.gltfLoader.setDRACOLoader( this.dracoLoader);
+    this.gltfLoader.setDRACOLoader(this.dracoLoader);
     [this.textureLoader, this.cubeTextureLoader].map(
       x => x.setCrossOrigin('Anonymous')
     );
   })();
+  uidMap = {}
+  subscribeList = []
   modelList = []
   watchDevList = []
   resourceMap = {}
@@ -191,6 +193,35 @@ class Store {
   destroy() {
     this.lastTree = null
     this.mountedPromise = new Promise(r => this.mountedPromiseResolve = r)
+  }
+
+  setUidMap(key, value) {
+    if (Reflect.has(this.uidMap, key)) {
+      throw new Error(`uid为${key}的值已经存在`)
+    }
+    this.uidMap[key] = value
+  }
+
+  deleteFromUidMap(key) {
+    if (!Reflect.has(this.uidMap, key)) {
+      throw new Error(`uid为${key}的值不存在`)
+    } 
+    Reflect.deleteProperty(this.uidMap, key)
+  }
+
+  pushSubScribe(s) {
+    this.subscribeList.push(s)
+  }
+
+  deleteSubScribe(x) {
+    const len = this.subscribeList.length;
+    for(let i = 0; i < len; i++) {
+       if(this.subscribeList[i] === x) {
+        this.subscribeList.splice(i, 1)
+        return true
+       }
+    }
+    return false;
   }
 
   pushNode(x) {

@@ -9,7 +9,7 @@ export function useLoop(fn, dev=[], option={}) {
     let raf = null
     let runFn = null
     let clock = store.clock
-    try {
+    try { // 大量运行，减少判断次数
       const step = (t = 0) => {
         fn({ clock, t })
         _render()
