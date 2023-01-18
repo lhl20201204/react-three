@@ -14,4 +14,10 @@ export function _render() {
   for(const subscribe of store.subscribeList) {
     subscribe.cb(time, subscribe._owner, subscribe.watch.map(uid => store.uidMap[uid]))
   }
+
+  for(const raycaster of store.raycaster) {
+    for(const m of raycaster._listenerMethodNameList) {
+      requestAnimationFrame(() =>_.size(raycaster._mouse) && raycaster[m]())
+    }
+  }
 }

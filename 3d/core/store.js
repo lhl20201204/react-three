@@ -37,6 +37,7 @@ class Store {
   scene = []
   control = []
   container = []
+  raycaster = []
   domElement = null
   isInWorld = false
   lastCountDicts = null
@@ -138,6 +139,10 @@ class Store {
     this.container = x;
   }
 
+  setRaycaster = (x) => {
+    this.raycaster = x
+  }
+
   setNode(type, fn) {
     return new Promise((resolve, reject) => {
       Promise.all(_.map(findNode({ type }, this.tree), x => _.get(x, _constant.promise, {})))
@@ -159,6 +164,7 @@ class Store {
       [_constant.cameraList, this.setCamera],
       [_constant.rendererList, this.setRenderer],
       [_constant.controlList, this.setControl],
+      [_constant.raycasterList, this.setRaycaster],
     ].map(x => this.setNode(x[0], x[1])));
   }
 

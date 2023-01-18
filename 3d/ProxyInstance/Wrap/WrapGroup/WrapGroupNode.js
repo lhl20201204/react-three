@@ -12,6 +12,7 @@ class WrapGroupNode extends PrimitiveWrap {
     this.group.userData[_constant.__proxy__] = this
     this.child.userData[_constant.__type__] = _.get(config, 'type')
     this.child.userData[_constant.__proxy__] = this
+    this.child.userData[_constant.__isHovering__] = false
 
     this.proxyData()
     const selfAttr = _.uniq([

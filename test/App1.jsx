@@ -31,6 +31,7 @@ export default () => {
       bg: getC(),
     }]
   )
+  const [color, setColor] = useState('white')
 
   useEffect(() => {
     setTimeout(() => {
@@ -61,9 +62,20 @@ export default () => {
       }
     }} />
   const ground = (
-    <Box width={1000} depth={1000} height={1} y={-0.5} onDoubleClick={(x) => {
-      setBoxPos({ ...x.point, y: x.point.y + 0.5 })
-    }}
+    <Box width={1000} depth={1000} height={1} y={-0.5}
+      onDoubleClick={(x) => {
+        setBoxPos({ ...x.point, y: x.point.y + 0.5 })
+        // console.log(x.point)
+      }}
+      color={color}
+      onMouseOver={() => {
+        console.log('鼠标移入草地')
+        setColor('green')
+      }}
+      onMouseOut={() => {
+        console.log('鼠标移出草地')
+        setColor('white')
+      }}
       map={'./ground.jpeg'}
     >
       <Field field='material.map'
@@ -76,7 +88,7 @@ export default () => {
   return (
     <World>
       <Container>
-        <Raycaster />
+        <Raycaster dblClick mouseMove />
         <WebGLRenderer />
         <TrackballControls />
         <CSS2DRenderer pointerEvents={'none'} />
@@ -145,7 +157,7 @@ export default () => {
             </Field>
           </Box>
           <AxesHelper size={100} />
-          <Sphere x={4} z={4} y={2}  map={'./earth.webp'} color={'rgba(127, 127, 127)'}
+          <Sphere x={4} z={4} y={2} map={'./earth.webp'} color={'rgba(127, 127, 127)'}
             onUpdate={(earth) => {
               earth.rotationY += 0.01
             }}

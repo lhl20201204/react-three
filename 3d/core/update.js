@@ -17,9 +17,6 @@ export function update() {
         scene.children = []
       }
     }
-    // for(const camera of store.camera) {
-    //   camera.updateProjectionMatrix();
-    // }
     for(const sceneItem of sceneItems) {
        traverseAstNode(sceneItem)
     }

@@ -42,12 +42,12 @@ export default () => {
 
   const [id, setId] = useState(1)
   useEffect(() => {
-    const len = Comps.length
-    for(let i = 0; i < len; i++) {
-      setTimeout(() => {
-        setId(((id + i + 1)% len) || len )
-      }, 3000 * (i + 1))
-    }
+    // const len = Comps.length
+    // for(let i = 0; i < len; i++) {
+    //   setTimeout(() => {
+    //     setId(((id + i + 1)% len) || len )
+    //   }, 3000 * (i + 1))
+    // }
   }, [])
   const Comp =Comps[id - 1]
   return progress === 1 && <Comp />

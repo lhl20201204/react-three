@@ -8,8 +8,11 @@ const findAttrList = ['FindAttr']
 const raycasterList = ['Raycaster']
 const __proxy__ = '$$__proxy__'
 const __type__ = '$$__type__'
+const __isHovering__ = '$$__hovering__'
 
 const _constant = {
+  __isHovering__,
+  eventList: ['click', 'dblClick', 'mouseDown', 'mouseUp', 'mouseMove'],
   cameraList,
   rendererList,
   sceneList,

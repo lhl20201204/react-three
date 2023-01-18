@@ -23,28 +23,19 @@ const Raycaster = function (props, ref) {
           resolve(new WrapSelfNode(new RaycasterNode(raycaster, { ...config, res }), config))
         }
       }
-    },
+    }
   })
 
   useEffect(() => {
-    let mouse = new THREE.Vector2();
-    const getHandle = (methodName) => event => {
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-      ref.current?.[methodName](mouse)
-    }
-    let handle = getHandle('checkClickTouchElement')
-    let handle2 = getHandle('checkDbClickTouchElemnt')
-    window.addEventListener('click', handle, false);
-    window.addEventListener('dblclick', handle2, false)
+    ref.current?.promise.then(() => {
+      ref.current.addEvent(props)
+    })
     return () => {
-      window.removeEventListener('click', handle, false);
-      window.removeEventListener('dblclick', handle2, false)
-      mouse = null
-      handle = null
-      handle2 = null
+      ref.current?.promise.then(() => {
+        ref.current.removeEvent(props)
+      })
     }
-  }, [])
+  }, _constant.eventList.map(x => props[x]))
 
   return props.children
 }
