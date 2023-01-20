@@ -13,7 +13,7 @@ export default () => {
         <Field field='shadowMap' enabled={true} >
         </Field>
       </WebGLRenderer>
-      <PerspectiveCamera x={2} y={3} z={-6}  />
+      <PerspectiveCamera x={2} y={3} z={-6} />
       <Scene
         fog={new THREE.Fog(0xa0a0a0, 10, 50)}
         background={new THREE.Color(0xa0a0a0)}

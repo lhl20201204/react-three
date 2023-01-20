@@ -6,6 +6,8 @@ import PromiseWrap from "../ProxyInstance/PromiseWrap";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+import { rewritePrototype } from "./rewritePrototype";
+rewritePrototype()
 class Store {
   mountedPromiseResolve = null
   mountedPromise = new Promise(resolve => {
@@ -99,7 +101,7 @@ class Store {
     const len = this.promiseWrapList.length;
     for (let i = 0; i < len; i++) {
       const cur = this.promiseWrapList[i]
-      if ([cur, cur.pid].includes(p)) {
+      if ([cur, cur.$pid].includes(p)) {
         this.promiseWrapList.splice(i, 1)
         return true
       }
@@ -147,7 +149,7 @@ class Store {
     return new Promise((resolve, reject) => {
       Promise.all(_.map(findNode({ type }, this.tree), x => _.get(x, _constant.promise, {})))
         .then(wrapList => {
-          fn(wrapList.sort((a, b) => b.level - a.level).map(x => x.node))
+          fn(wrapList.sort((a, b) => b.$level - a.$level).map(x => x.node))
           resolve(wrapList)
         }
         ).catch(e => {

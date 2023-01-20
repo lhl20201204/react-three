@@ -1,6 +1,5 @@
 import _constant from "../../constant"
 import PrimitiveNode from "./PrimitiveNode"
-import * as THREE from 'three'
 import { firstToUppercase } from "../../Util"
 import _ from "lodash"
 
@@ -27,7 +26,7 @@ export default class RaycasterNode extends PrimitiveNode {
     }
     const mouse = this._mouse
     this.raycaster.setFromCamera(mouse, this.camera);
-    const intersects = this.raycaster.intersectObjects(this.scene.children, true)
+    const intersects = this.raycaster.intersectObjects(this.scene.children, true).reverse()
     if (intersects) {
       this.promiseWrap?.props?.[type]?.(intersects)
     }
@@ -41,22 +40,22 @@ export default class RaycasterNode extends PrimitiveNode {
       const out = _.uniqBy(this._lastUniqIntersects.filter(x => !uniqIntersectsId.includes(getUid(x))), getUid)
       for (const x of over) {
         if (x.object?.userData && !x.object.userData[_constant.__isHovering__]) {
-          x.object?.userData?.onMouseOver?.(x)
+          x.object?.userData?.[_constant.__proxy__]?.props?.onMouseOver?.(x)
           x.object.userData[_constant.__isHovering__] = true
         }
       }
       for (const x of out) {
         if (x.object?.userData && x.object.userData[_constant.__isHovering__]) {
-          x.object?.userData?.onMouseOut?.(x)
+          x.object?.userData?.[_constant.__proxy__]?.props?.onMouseOut?.(x)
           x.object.userData[_constant.__isHovering__] = false
         }
       }
       for (const x of uniqIntersects) {
-        x.object?.userData?.onMouseMove?.(x)
+        x.object?.userData?.[_constant.__proxy__]?.props?.onMouseMove?.(x)
       }
     } else if (uniqIntersects.length) {
       for (const x of uniqIntersects) {
-        x.object?.userData?.[type]?.(x)
+        x.object?.userData?.[_constant.__proxy__]?.props?.[type]?.(x)
       }
     }
     this._lastUniqIntersects = uniqIntersects
@@ -86,11 +85,11 @@ export default class RaycasterNode extends PrimitiveNode {
       if (props[type]) {
         if (type === 'mouseMove') {
           this._listenerMethodNameList.push(this._handles[i].methodName)
-        }
+        } 
         window.addEventListener(type.toLowerCase(), this._handles[i].fn, false);
       }
     }
-    console.log(this._listenerMethodNameList)
+   
   }
 
   removeEvent = (props) => {

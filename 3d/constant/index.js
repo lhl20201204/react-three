@@ -9,9 +9,11 @@ const raycasterList = ['Raycaster']
 const __proxy__ = '$$__proxy__'
 const __type__ = '$$__type__'
 const __isHovering__ = '$$__hovering__'
+const __stride__ = '$$__stride__'
 
 const _constant = {
   __isHovering__,
+  __stride__,
   eventList: ['click', 'dblClick', 'mouseDown', 'mouseUp', 'mouseMove'],
   cameraList,
   rendererList,
@@ -43,6 +45,7 @@ const _constant = {
   propsOmit: [funRef, __proxy__, __type__, 'children', 'ref'],
   mapAttrList: ['map'],
   colorAttrList: ['color'],
+  strideAttrList: ['moveForward', 'distVec'],
   __proxy__,
   __type__,
 }

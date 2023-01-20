@@ -1,3 +1,5 @@
+import _ from "lodash"
+
 const firstTo = (m) => (str) => {
   if (!str) {
     return ''
@@ -22,3 +24,11 @@ export const getScale = (x) => (
     scaleZ: x,
   }
 )
+
+export const getPosition  = (ref, c) => {
+  return {
+    x: _.get(ref, 'current.x', c?.x ?? 0),
+    y: _.get(ref, 'current.y', c?.y ?? 0),
+    z: _.get(ref, 'current.z', c?.z ?? 0)
+  }
+}

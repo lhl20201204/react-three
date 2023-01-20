@@ -39,10 +39,10 @@ export function getAst(pre, suf) {
     if ((current instanceof PromiseWrap)) {
       current._addToParent(level, parent)
       const childrenPromiseWrap = a.children.map(c => dict[c.name].value.current)
-      current.childrenPromiseResolve(childrenPromiseWrap)
+      current.$childrenPromiseResolve(childrenPromiseWrap)
       childrenPromiseWrap.map(pw => {
         if (pw instanceof PromiseWrap) {
-          pw.siblingPromiseResolve(childrenPromiseWrap.filter(x => x !== pw))
+          pw.$siblingPromiseResolve(childrenPromiseWrap.filter(x => x !== pw))
         }
       })
     }

@@ -14,7 +14,7 @@ export default class PrimitiveWrap {
     this.promiseWrap = _.get(config, 'promiseWrap')
     this.type = _.get(config, 'type')
     this.props = _.get(config, 'props')
-    this.level = -1
+    this._level = -1
   }
   updateProps(props) {
     this.props = props
@@ -42,7 +42,7 @@ export default class PrimitiveWrap {
   }
 
   setLevel(x) {
-    this.level = x;
+    this._level = x;
   }
 
   proxyData(arr = [['group', ''], ['child', 'inner']]) {

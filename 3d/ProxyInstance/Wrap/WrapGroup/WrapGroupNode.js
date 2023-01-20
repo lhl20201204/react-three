@@ -1,6 +1,7 @@
 import _ from "lodash"
 import _constant from "../../../constant"
-import { getValue, setColor, setResource, setValue, useMiddleWare } from "../../../MiddleWare"
+import { getStride, getValue, setColor, setResource, setValue, useMiddleWare } from "../../../MiddleWare"
+import { Stride } from "../../Control"
 import PrimitiveWrap from "../PrimitiveWrap"
 
 class WrapGroupNode extends PrimitiveWrap {
@@ -10,10 +11,16 @@ class WrapGroupNode extends PrimitiveWrap {
     this.child = _.get(group, 'children.0')
     this.group.userData[_constant.__type__] = _.get(config, 'type') + '_of_Group'
     this.group.userData[_constant.__proxy__] = this
-    this.child.userData[_constant.__type__] = _.get(config, 'type')
-    this.child.userData[_constant.__proxy__] = this
-    this.child.userData[_constant.__isHovering__] = false
-
+    const appendUserData =(x) => {
+      x.userData[_constant.__stride__] = new Stride(this)
+      x.userData[_constant.__type__] = _.get(config, 'type')
+      x.userData[_constant.__proxy__] = this
+      x.userData[_constant.__isHovering__] = false
+      for(const c of x.children) {
+        appendUserData(c)
+      }
+    }
+    appendUserData(this.child)
     this.proxyData()
     const selfAttr = _.uniq([
       ...Reflect.ownKeys(this),
@@ -27,7 +34,7 @@ class WrapGroupNode extends PrimitiveWrap {
      ..._constant.mapAttrList
     ])
     const defaultSetMiddleWare = [setColor('child.material'), setResource('child.material')]
-    const defaultGetMiddleWare = []
+    const defaultGetMiddleWare = [getStride('child.userData.' + _constant.__stride__)]
    
     const change = useMiddleWare([...(option?.setMiddleWare ? option.setMiddleWare : []), ...defaultSetMiddleWare], setValue('child'))
     const require = useMiddleWare([...(option?.getMiddleWare ? option.getMiddleWare : []), ...defaultGetMiddleWare], getValue('child'))

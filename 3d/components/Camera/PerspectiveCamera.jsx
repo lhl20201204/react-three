@@ -15,7 +15,7 @@ const PerspectiveCamera = function (props, ref) {
         _.get(props, 'near', 0.1),
         _.get(props, 'far', 2000)
       )
-      camera.lookAt(0, 0, 0)
+      // camera.lookAt(0, 0, 0)
       return camera
     })
   })

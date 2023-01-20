@@ -8,7 +8,7 @@ export default class PromiseWrap {
       rejectRef,
       type,
     } = config || {}
-    this.pid = pid++;
+    this.$pid = pid++;
     let resolve = _.get(resolveRef, 'current'),
       reject = _.get(rejectRef, 'current')
     const promise = _.get(promiseRef, 'current') || new Promise((res, rej) => {
@@ -17,42 +17,42 @@ export default class PromiseWrap {
     })
     promise.then(value => {
       if (value instanceof PrimitiveWrap) {
-        value.setLevel(this.level)
+        value.setLevel(this.$level)
       }
-      this._value = value 
+      this.$value = value 
       value.props?.onLoad?.(value)
     })
-    this.parentPromiseResolve = null
-    this._parent = null
+    this.$parentPromiseResolve = null
+    this.$parent = null
     const parentPromise = new Promise(r1 => {
-      this.parentPromiseResolve = r1
+      this.$parentPromiseResolve = r1
     })
     parentPromise.then(p => {
-      this._parent = p;
+      this.$parent = p;
     })
-    this.parentPromise = parentPromise
-    this._children = [];
-    this.childrenPromiseResolve = null
+    this.$parentPromise = parentPromise
+    this.$children = [];
+    this.$childrenPromiseResolve = null
     const childrenPromise = new Promise(r2 => {
-      this.childrenPromiseResolve = r2
+      this.$childrenPromiseResolve = r2
     })
     childrenPromise.then(c => {
-      this._children = c;
+      this.$children = c;
     })
-    this.childrenPromise = childrenPromise
+    this.$childrenPromise = childrenPromise
 
-    this.siblingPromiseResolve = null
+    this.$siblingPromiseResolve = null
     const siblingPromise = new Promise(r3 => {
-      this.siblingPromiseResolve = r3;
+      this.$siblingPromiseResolve = r3;
     })
-    this._sibling = []
+    this.$sibling = []
     siblingPromise.then(s => {
-      this._sibling = s;
+      this.$sibling = s;
     })
-    this.siblingPromise = siblingPromise;
+    this.$siblingPromise = siblingPromise;
 
-    this.level = -1;
-    this._value = {};
+    this.$level = -1;
+    this.$value = {};
     this.resolve = resolve;
     this.reject = reject;
     this.promise = promise;
@@ -63,19 +63,19 @@ export default class PromiseWrap {
         if (selfAttr.includes(attr)) {
           _this[attr] = v
         } else {
-          _this._value[attr] = v
+          _this.$value[attr] = v
         }
         return true
       },
       get(_this, attr) {
-        return selfAttr.includes(attr) ? _this[attr] : _this._value[attr]
+        return selfAttr.includes(attr) ? _this[attr] : _this.$value[attr]
       }
     })
   }
 
   _addToParent(level, parent) {
-    this.level = level;
-    this.parentPromiseResolve(parent)
+    this.$level = level;
+    this.$parentPromiseResolve(parent)
   }
 
   _removeFromParent() {
