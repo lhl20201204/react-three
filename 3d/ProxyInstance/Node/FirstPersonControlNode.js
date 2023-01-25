@@ -1,0 +1,232 @@
+import _constant from "../../constant"
+import PrimitiveNode from "./PrimitiveNode"
+import * as THREE from 'three'
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
+import { getStore } from "../../core/store";
+const store = getStore()
+export default class FirstPersonControlNode extends PrimitiveNode {
+  constructor(res, config) {
+    super(config)
+    this.scene = res.scene
+    if (res.control instanceof PointerLockControls) {
+      this.control = res.control
+    } else {
+      throw new Error('control 初始化失败')
+    }
+    if (res.camera instanceof THREE.Camera) {
+      this.camera = res.camera;
+    } else {
+      throw new Error('camera 初始化失败')
+    }
+
+    this._moveForward = false;
+    this._moveBackward = false;
+    this._moveLeft = false;
+    this._moveRight = false;
+    this._canJump = false;
+    this._eyeHeight = _.get(this.props, 'eyeHeight', 5)
+    this._jumpHeight = _.get(this.props, 'jumpHeight ', 200)
+    this._continueJump = _.get(this.props, 'continueJump', false)
+    this._intersectIDs = _.get(this.props, 'intersectIDs', [])
+    this._velocity = new THREE.Vector3()
+    this._direction = new THREE.Vector3()
+    this._prevTime = performance.now()
+    this._speedStep = _.get(this.props, 'speedStep', 10)
+    this._speed = _.get(this.props, 'speed', 400)
+    this._mass = _.get(this.props, 'mass', 100)
+    this._g = _.get(this.props, 'g', 9.8)
+    this._a = _.get(this.props, 'a', 2)
+    this._raycaster = new THREE.Raycaster(
+      new THREE.Vector3(),
+      new THREE.Vector3(0, -1, 0),
+      0,
+      this._eyeHeight
+    );
+    this._PI_2 = Math.PI * 2
+  }
+
+  _onLock = (...args) => {
+    this.props?.onlock?.(...args)
+  }
+
+  _onUnLock = (...args) => {
+    this.props?.onUnLock?.(...args)
+  }
+
+  _onKeyDown = (event) => {
+    switch (event.code) {
+      case "ArrowUp":
+      case "KeyW":
+        this._moveForward = true;
+        break;
+
+      case "ArrowLeft":
+      case "KeyA":
+        this._moveLeft = true;
+        break;
+
+      case "ArrowDown":
+      case "KeyS":
+        this._moveBackward = true;
+        break;
+
+      case "ArrowRight":
+      case "KeyD":
+        this._moveRight = true;
+        break;
+      case "ShiftLeft":
+      case "ShiftRIGHT":
+        this._pressShift = true;
+        break;
+      case "Space":
+        if (this._canJump === true) {
+          this._velocity.y += this._jumpHeight;
+        }
+        if (!this._continueJump) {
+          this._canJump = false;
+        }
+        break;
+    }
+  }
+
+  _onKeyUp = (event) => {
+    switch (event.code) {
+      case "ArrowUp":
+      case "KeyW":
+        this._moveForward = false;
+        break;
+
+      case "ArrowLeft":
+      case "KeyA":
+        this._moveLeft = false;
+        break;
+
+      case "ArrowDown":
+      case "KeyS":
+        this._moveBackward = false;
+        break;
+
+      case "ArrowRight":
+      case "KeyD":
+        this._moveRight = false;
+        break;
+      case "ShiftLeft":
+      case "ShiftRIGHT":
+        this._pressShift = false;
+        break;
+    }
+  }
+
+
+
+  addEvent() {
+    this.control.addEventListener("lock", this._onLock)
+    this.control.addEventListener("unlock", this._onUnLock);
+    document.addEventListener("keydown", this._onKeyDown);
+    document.addEventListener("keyup", this._onKeyUp);
+  }
+
+  removeEvent() {
+    this.control.removeEventListener("lock", this._onLock)
+    this.control.removeEventListener("unlock", this._onUnLock);
+    document.removeEventListener("keydown", this._onKeyDown);
+    document.removeEventListener("keyup", this._onKeyUp);
+  }
+
+  _collideCheck = (angle) => {
+    let rotationMatrix = new THREE.Matrix4();
+    //射线方向设置为对应按键移动方向
+    rotationMatrix.makeRotationY(angle * Math.PI / 180);
+    const cameraDirection = this.control.getDirection(new THREE.Vector3(0, 0, 0)).clone()
+    cameraDirection.applyMatrix4(rotationMatrix);
+    const raycaster = new THREE.Raycaster(this.camera.position.clone(), cameraDirection, 0, 5);
+    const intersectObjects = this._intersectIDs.map(x => (store.uidMap[x]).child)
+    const intersections = raycaster.intersectObjects(intersectObjects, true);
+    return intersections.length;
+  }
+
+  update = () => {
+    const time = performance.now();
+    if (this.control.isLocked ===true) {
+      const raycaster = this._raycaster
+      raycaster.ray.origin.copy(this.camera.position);
+      // raycaster.ray.origin.y -= this._eyeHeight;
+      const intersectObjects = this._intersectIDs.map(x => (store.uidMap[x]).child)
+      const intersections = raycaster.intersectObjects(intersectObjects, true);
+      const onObject = intersections.length;
+      //四个方位是否产生碰撞
+      let leftCollide = [];
+      let rightCollide = [];
+      let forwardCollide = [];
+      let backCollide = [];
+
+      const moveForward = this._moveForward
+      const moveBackward = this._moveBackward
+      const moveLeft = this._moveLeft
+      const moveRight = this._moveRight
+      const direction = this._direction;
+      const velocity = this._velocity
+      const controls = this.control
+      const eyeHeight = this._eyeHeight
+      const camera = this.camera
+
+      if (moveForward) {
+        forwardCollide = this._collideCheck(0);
+      }
+      if (moveBackward) {
+        backCollide = this._collideCheck(180);
+      }
+      if (moveLeft) {
+        leftCollide = this._collideCheck(90);
+      }
+      if (moveRight) {
+        rightCollide = this._collideCheck(270);
+      }
+      direction.z = Number(moveForward) - Number(moveBackward);
+      direction.x = Number(moveRight) - Number(moveLeft);
+      direction.normalize();
+
+      const delta = (time - this._prevTime) / 1000;
+
+      velocity.x -= velocity.x * this._speedStep * delta;
+      velocity.z -= velocity.z * this._speedStep * delta;
+      velocity.y -= this._g * this._mass * delta;
+
+      direction.z = Number(moveForward) - Number(moveBackward);
+      direction.x = Number(moveRight) - Number(moveLeft);
+      direction.normalize();
+
+      if (moveForward || moveBackward) velocity.z -= direction.z * this._speed * delta;
+      if (moveLeft || moveRight) velocity.x -= direction.x * this._speed * delta;
+
+      if (onObject) {
+        velocity.y = Math.max(0, velocity.y);
+        this._canJump = true;
+      }
+      const quicken = this._pressShift ? this._a : 1;
+
+      let rightDistance = -velocity.x * delta * quicken;
+      let forwardDistance = -velocity.z * delta * quicken;
+
+      if ((moveRight && rightCollide) || (moveLeft && leftCollide)) {
+        rightDistance = 0;
+      }
+
+      if ((moveForward && forwardCollide) || (moveBackward && backCollide)) {
+        forwardDistance = 0;
+      }
+
+      if (moveLeft || moveRight) controls.moveRight(rightDistance);
+
+      if (moveForward || moveBackward) controls.moveForward(forwardDistance);
+
+      camera.position.y += velocity.y * delta;
+      if (camera.position.y < eyeHeight) {
+        velocity.y = 0;
+        camera.position.y = eyeHeight;
+        this._canJump = true;
+      }
+    }
+    this._prevTime = time;
+  }
+}

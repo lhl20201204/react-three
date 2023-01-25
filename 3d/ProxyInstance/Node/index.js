@@ -3,6 +3,7 @@ import ContainerNode from "./ContainerNode";
 import RaycasterNode from "./RaycasterNode";
 import WorldNode from "./WorldNode";
 import ModelNode from "./ModelNode";
+import FirstPersonControlNode from "./FirstPersonControlNode";
 
 export {
   PrimitiveNode,
@@ -10,4 +11,5 @@ export {
   RaycasterNode,
   WorldNode,
   ModelNode,
+  FirstPersonControlNode,
 }

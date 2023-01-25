@@ -1,7 +1,7 @@
 import _ from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { Vector3 } from "three";
-import { Scene, AmbientLight, AxesHelper, Box, Container, CSS2DObject, CSS2DRenderer, CSS3DObject, CSS3DRenderer, Field, mixColor, Model, OrbitControls, PerspectiveCamera, Raycaster, Sphere, THREE, TrackballControls, useLoop, usePreload, WebGLRenderer, World, getScale, SkeletonHelper, HemisphereLight, DirectionalLight, getPosition } from "../3d";
+import { Scene, AmbientLight, AxesHelper, Box, Container, CSS2DObject, CSS2DRenderer, CSS3DObject, CSS3DRenderer, Field, mixColor, Model, OrbitControls, PerspectiveCamera, Raycaster, Sphere, THREE, TrackballControls, useLoop, usePreload, WebGLRenderer, World, getScale, SkeletonHelper, HemisphereLight, DirectionalLight, getPosition, FirstPersonControls } from "../3d";
 const rand = x => Math.floor(Math.random() * x)
 const getC = () => `rgb(${rand(255)}, ${rand(255)}, ${rand(255)})`
 const skyboxUrl = [
@@ -33,6 +33,8 @@ export default () => {
     }]
   )
   const [color, setColor] = useState('white')
+  const controlRef = useRef()
+  const [btnShow, setBtnShow] = useState(true)
 
   useEffect(() => {
     setTimeout(() => {
@@ -55,19 +57,22 @@ export default () => {
   })
   // 相机
   const camera = <PerspectiveCamera ref={cameraRef}
-    subscribe={{
-      watch: ['soldier', 'fox'],
-      cb: (_, a, b) => {
-        // b[0] 是订阅的uid为soldier，b[1]是订阅的uid为fox的
-        a.x = b[0].x
-        a.y = b[0].y + 8
-        a.z = b[0].z 
-        a.lookAt(new THREE.Vector3(b[1].x, b[1].y, b[1].z))
-      }
-    }} />
+    {...getPosition(cameraRef, { x: 0, y: 10, z: 70 })}
+  // subscribe={{
+  //   watch: ['soldier', 'fox'],
+  //   cb: (_, a, b) => {
+  //     // b[0] 是订阅的uid为soldier，b[1]是订阅的uid为fox的
+  //     a.x = b[0].x
+  //     a.y = b[0].y + 8
+  //     a.z = b[0].z 
+  //     a.lookAt(new THREE.Vector3(b[1].x, b[1].y, b[1].z))
+  //   }
+  // }} 
+  />
   // 草地
   const ground = (
     <Box width={1000} depth={1000} height={1} y={-0.5}
+      uid="floor"
       onDoubleClick={(x) => {
         setBoxPos({ ...x.point, y: x.point.y + 0.5 })
         foxRef.current.lookAt(x.point)
@@ -142,9 +147,10 @@ export default () => {
       side={THREE.DoubleSide}
     >
     </Field>
-    <CSS2DObject y={1} >
-      {/* todo 2d无法点击 */}
-      <div style={{ color: 'white' }} y={2}>地球</div>
+    <CSS2DObject y={1} onClick={x => {
+      console.log(x, '地球label点击')
+    }}>
+      <div style={{ color: 'white' }} >地球</div>
     </CSS2DObject>
   </Sphere>
   // 立方体
@@ -167,12 +173,17 @@ export default () => {
       <Container>
         <Raycaster dblClick mouseMove />
         <WebGLRenderer />
-        {/* <TrackballControls /> */}
+        <FirstPersonControls
+          ref={controlRef}
+          intersectIDs={['floor', 'fox', 'wall']}
+          onUnLock={() => setBtnShow(true)}
+        />
         <CSS2DRenderer pointerEvents={'none'} />
         {camera}
         <Scene
           skybox={skyboxUrl}
         >
+          <Box uid="wall" height={100} width={100} z={-20} color={'black'} />
           <Box x={2} z={2} y={0.5} color={'blue'} visible={show === 1}>
           </Box>
           <HemisphereLight y={20} />
@@ -203,11 +214,13 @@ export default () => {
                 onUpdate={x => {
                   x.rotationY += 0.01 * item.i
                 }}
+                onClick={x => {
+                  console.log(x, '3dobject点击')
+                }}
                 x={-3 * item.i} y={2 * item.i} z={-2} scaleX={0.01} scaleY={0.01}>
-                {/* todo 3d无法点击 */}
                 <div
                   style={{ color: item.c, width: 100, height: 100, background: item.bg, fontSize: 28 }}>
-                  我是3d
+                  我是3dw
                 </div>
               </CSS3DObject>)
           }
@@ -216,6 +229,14 @@ export default () => {
         <Raycaster />
         {camera}
       </Container>
+      <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <button style={{ display: btnShow ? 'inline-block' : 'none' }} onClick={() => {
+          controlRef.current.control.lock()
+          setBtnShow(false)
+        }}>
+          进入全屏
+        </button>
+      </div>
     </World>
   )
 }

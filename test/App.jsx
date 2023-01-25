@@ -50,5 +50,5 @@ export default () => {
     // }
   }, [])
   const Comp =Comps[id - 1]
-  return progress === 1 && <Comp />
+  return progress === 1 &&  <Comp />
 }

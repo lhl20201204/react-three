@@ -2,6 +2,7 @@ import _ from "lodash"
 import _constant from "../../../constant"
 import { setColor, setValue, useMiddleWare } from "../../../MiddleWare"
 import PrimitiveWrap from "../PrimitiveWrap"
+import * as THREE from 'three'
 
 class WrapNode extends PrimitiveWrap {
   constructor(node, config, option) {
@@ -12,7 +13,8 @@ class WrapNode extends PrimitiveWrap {
     }
     this.node.userData[_constant.__type__] = _.get(config, 'type')
     this.node.userData[_constant.__proxy__] = this
-    if (!option || !option.noRegisterAttr) {
+
+    if (node instanceof THREE.Object3D) {
       this.proxyData([['node', '']])
     }
     const selfAttr = _.uniq([
