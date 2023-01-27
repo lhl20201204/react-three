@@ -13,7 +13,7 @@ export function _render() {
   }
   const time = { clock }
   for(const subscribe of store.subscribeList) {
-    subscribe.cb(time, subscribe._owner, subscribe.watch.map(uid => store.uidMap[uid]))
+    subscribe.cb(subscribe._owner, time, subscribe.watch.map(uid => store.uidMap[uid]),)
   }
   for(const raycaster of store.raycaster) {
     for(const m of raycaster._listenerMethodNameList) {

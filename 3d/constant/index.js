@@ -10,7 +10,7 @@ const __proxy__ = '$$__proxy__'
 const __type__ = '$$__type__'
 const __isHovering__ = '$$__hovering__'
 const __stride__ = '$$__stride__'
-
+const __isBox3__ = '$$__isBox3__'
 const _constant = {
   __isHovering__,
   __stride__,
@@ -34,18 +34,24 @@ const _constant = {
   excludeAttrList: [
     __proxy__,
     __type__,
+    __isHovering__,
+    __stride__,
+    __isBox3__,
   ],
   grandAddList: ['SkeletonHelper'],
   promise: 'value.current.promise',
   node: 'value.current.node',
-  group: 'value.current.group',
+  wrap: 'value.current.wrap',
   child: 'value.current.child',
   onParentMounted: 'value.current.onParentMounted',
   funRef,
   propsOmit: [funRef, __proxy__, __type__, 'children', 'ref'],
   mapAttrList: ['map'],
   colorAttrList: ['color'],
-  strideAttrList: ['moveForward', 'distVec'],
+  box3AttrList: ['boxVisible'],
+  __isBox3__,
+  strideAttrList: ['goToLookAt', 'distVec'],
+  wrapName: 'wrap',
   __proxy__,
   __type__,
 }

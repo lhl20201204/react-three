@@ -6,8 +6,7 @@ import PromiseWrap from "../ProxyInstance/PromiseWrap";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
-import { rewritePrototype } from "./rewritePrototype";
-rewritePrototype()
+
 class Store {
   mountedPromiseResolve = null
   mountedPromise = new Promise(resolve => {

@@ -5,6 +5,7 @@ export function useSubcribe(props, promiseWrap) {
   useEffect(() => {
     let subscribe = props.subscribe || null
     let onUpdate = props.onUpdate || null
+    let subscribeList = []
     if (subscribe) {
       if (!subscribe.cb) {
         throw new Error('subscribe 必须 要有cb属性')
@@ -17,19 +18,23 @@ export function useSubcribe(props, promiseWrap) {
       }
       subscribe._owner = promiseWrap;
       store.pushSubScribe(subscribe)
-    } else if (typeof onUpdate === 'function') {
+      subscribeList.push(subscribe)
+    }
+    if (typeof onUpdate === 'function') {
       subscribe = {
         watch: [],
-        cb: (x, _this, ...rest) => onUpdate(_this, x, ...rest),
+        cb: onUpdate,
         _owner: promiseWrap
       }
       store.pushSubScribe(subscribe)
+      subscribeList.push(subscribe)
     }
     return () => {
-      if ((subscribe && !store.deleteSubScribe(subscribe))) {
+      if ((subscribeList.length && subscribeList.some(x => !store.deleteSubScribe(x)))) {
         throw new Error('删除失败')
       }
       subscribe = null
+      subscribeList = null
       promiseWrap = null
     }
   }, [props.onUpdate, props.subscribe])

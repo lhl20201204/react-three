@@ -20,7 +20,6 @@ export function update() {
     for(const sceneItem of sceneItems) {
        traverseAstNode(sceneItem)
     }
-    await store.runPromiseWrapList()
-    requestAnimationFrame(_render)
+    store.runPromiseWrapList().then(() => requestAnimationFrame(_render))
   })();
 }

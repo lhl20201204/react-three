@@ -57,17 +57,7 @@ export default () => {
   })
   // 相机
   const camera = <PerspectiveCamera ref={cameraRef}
-    {...getPosition(cameraRef, { x: 0, y: 10, z: 70 })}
-  // subscribe={{
-  //   watch: ['soldier', 'fox'],
-  //   cb: (_, a, b) => {
-  //     // b[0] 是订阅的uid为soldier，b[1]是订阅的uid为fox的
-  //     a.x = b[0].x
-  //     a.y = b[0].y + 8
-  //     a.z = b[0].z 
-  //     a.lookAt(new THREE.Vector3(b[1].x, b[1].y, b[1].z))
-  //   }
-  // }} 
+    {...getPosition(cameraRef, { x: 0, y: 10, z: 70 })} // 因为相机一般会被control改变，所以位置不能写死
   />
   // 草地
   const ground = (
@@ -113,6 +103,7 @@ export default () => {
   </Model>
   // 狐狸
   const fox = <Model
+  boxVisible
     uid="fox"
     {...getPosition(foxRef)}
     src={'./Fox.fbx'}
@@ -121,7 +112,7 @@ export default () => {
     animations={{ idle: "./Idle.fbx", walking: "./Walking.fbx", soldier: './Soldier.glb' }}
     action={action}
     onUpdate={(x) => {
-      x.moveForward(0.08)
+      x.goToLookAt(0.08)
       if (x.distVec > 0 && action === 'idle') {
         setAction('walking')
       } else if (x.distVec === 0 && action === 'walking') {
@@ -131,14 +122,16 @@ export default () => {
   >
     {/* 狐狸的骨骼 */}
     <SkeletonHelper></SkeletonHelper>
-    <CSS2DObject ref={css2dRef} y={400} >
+    <CSS2DObject ref={css2dRef} y={400} onClick={x => {
+      console.log(x, '位置坐标点击')
+    }}>
       <div style={{ color: 'white', textAlign: 'center' }} >
         双击前往目标<br />
         {'('}{Math.round(boxPos.x)},{Math.round(boxPos.z)}{')'} </div>
     </CSS2DObject>
   </Model>
   // 地球
-  const earth = <Sphere x={4} z={4} y={2} map={'./earth.webp'} color={'rgba(127, 127, 127)'}
+  const earth = <Sphere boxVisible x={4} z={4} y={2} map={'./earth.webp'} color={'rgba(127, 127, 127)'}
     onUpdate={(earth) => {
       earth.rotationY += 0.01
     }}
@@ -158,15 +151,28 @@ export default () => {
     y={2}
     map={'./top.webp'}
     onUpdate={(obj) => {
-      obj.rotationX += 0.01
-      obj.rotationY += 0.01
+      obj.innerRotationX += 0.01
+      obj.innerRotationY += 0.01
     }}
+    boxVisible
   >
     <Field field="material" ref={boxMaterialRef}
       side={THREE.DoubleSide}
     >
     </Field>
   </Box>
+
+  const light = <DirectionalLight x={-3} y={10} z={-10} castShadow={true} >
+    <Field field="shadow.camera"
+      top={4}
+      bottom={-4}
+      left={4}
+      right={-4}
+      near={0.1}
+      far={40}
+    >
+    </Field>
+  </DirectionalLight>
 
   return (
     <World>
@@ -178,26 +184,18 @@ export default () => {
           intersectIDs={['floor', 'fox', 'wall']}
           onUnLock={() => setBtnShow(true)}
         />
+        {/* <OrbitControls /> */}
         <CSS2DRenderer pointerEvents={'none'} />
         {camera}
         <Scene
           skybox={skyboxUrl}
         >
-          <Box uid="wall" height={100} width={100} z={-20} color={'black'} />
-          <Box x={2} z={2} y={0.5} color={'blue'} visible={show === 1}>
+          <Box uid="wall" boxVisible height={8} map={'./earth.webp'} width={100} depth={100} z={-70} color={'yellow'} >
           </Box>
+          {show === 1 && <Box x={2} z={2} y={0.5} color={'blue'} >
+          </Box>}
           <HemisphereLight y={20} />
-          <DirectionalLight x={-3} y={10} z={-10} castShadow={true} >
-            <Field field="shadow.camera"
-              top={4}
-              bottom={-4}
-              left={4}
-              right={-4}
-              near={0.1}
-              far={40}
-            >
-            </Field>
-          </DirectionalLight>
+          {light}
           {ground}
           {solider}
           {fox}
@@ -229,12 +227,15 @@ export default () => {
         <Raycaster />
         {camera}
       </Container>
-      <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <div style={{
+        height: '100vh',
+        display: 'flex', justifyContent: 'center', alignItems: 'center'
+      }}>
         <button style={{ display: btnShow ? 'inline-block' : 'none' }} onClick={() => {
-          controlRef.current.control.lock()
+          controlRef.current.lock()
           setBtnShow(false)
         }}>
-          进入全屏
+          进入第一人称视角
         </button>
       </div>
     </World>

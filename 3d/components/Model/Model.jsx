@@ -11,7 +11,7 @@ const store = getStore();
 const Model = function (props, ref) {
   const actionsRef = useRef([])
   const actionRef = useRef({})
-  usePromiseWrap(props, ref, {
+  const configRef = usePromiseWrap(props, ref, {
     type: 'Model',
     f: (config) => {
       const src = _.get(props, 'src') || ''
@@ -74,6 +74,7 @@ const Model = function (props, ref) {
         if ([i, name].includes(seletedAction)) {
           actionRef.current = action;
           action.play()
+          configRef.current.promiseWrap._changeBox3?.() // 待解决
         }
       }
     }

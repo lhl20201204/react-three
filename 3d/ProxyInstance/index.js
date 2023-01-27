@@ -1,6 +1,6 @@
 export * from "./Wrap"
 export * from "./Node";
-export * from "./Control"
+export * from "./Helper"
 import PromiseWrap from "./PromiseWrap";
 
 export {

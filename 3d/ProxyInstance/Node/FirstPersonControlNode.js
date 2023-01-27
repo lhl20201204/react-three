@@ -3,34 +3,23 @@ import PrimitiveNode from "./PrimitiveNode"
 import * as THREE from 'three'
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 import { getStore } from "../../core/store";
+import _ from "lodash"
+
 const store = getStore()
 export default class FirstPersonControlNode extends PrimitiveNode {
   constructor(res, config) {
     super(config)
-    this.scene = res.scene
     if (res.control instanceof PointerLockControls) {
       this.control = res.control
     } else {
       throw new Error('control 初始化失败')
     }
-    if (res.camera instanceof THREE.Camera) {
-      this.camera = res.camera;
-    } else {
-      throw new Error('camera 初始化失败')
-    }
+    this.camera = res.camera;
 
-    this._moveForward = false;
-    this._moveBackward = false;
-    this._moveLeft = false;
-    this._moveRight = false;
-    this._canJump = false;
     this._eyeHeight = _.get(this.props, 'eyeHeight', 5)
     this._jumpHeight = _.get(this.props, 'jumpHeight ', 200)
     this._continueJump = _.get(this.props, 'continueJump', false)
     this._intersectIDs = _.get(this.props, 'intersectIDs', [])
-    this._velocity = new THREE.Vector3()
-    this._direction = new THREE.Vector3()
-    this._prevTime = performance.now()
     this._speedStep = _.get(this.props, 'speedStep', 10)
     this._speed = _.get(this.props, 'speed', 400)
     this._mass = _.get(this.props, 'mass', 100)
@@ -43,6 +32,18 @@ export default class FirstPersonControlNode extends PrimitiveNode {
       this._eyeHeight
     );
     this._PI_2 = Math.PI * 2
+    this._moveForward = false;
+    this._moveBackward = false;
+    this._moveLeft = false;
+    this._moveRight = false;
+    this._canJump = false;
+    this._velocity = new THREE.Vector3()
+    this._direction = new THREE.Vector3()
+    this._prevTime = performance.now()
+  }
+
+  lock = (...args) => {
+    this.control.lock(...args);
   }
 
   _onLock = (...args) => {
@@ -87,6 +88,7 @@ export default class FirstPersonControlNode extends PrimitiveNode {
         }
         break;
     }
+    this.promiseWrap.userData?.onKeyDown?.(event.code)
   }
 
   _onKeyUp = (event) => {
@@ -115,6 +117,7 @@ export default class FirstPersonControlNode extends PrimitiveNode {
         this._pressShift = false;
         break;
     }
+    this.promiseWrap.userData?.onKeyUp?.(event.code)
   }
 
 
@@ -137,9 +140,11 @@ export default class FirstPersonControlNode extends PrimitiveNode {
     let rotationMatrix = new THREE.Matrix4();
     //射线方向设置为对应按键移动方向
     rotationMatrix.makeRotationY(angle * Math.PI / 180);
-    const cameraDirection = this.control.getDirection(new THREE.Vector3(0, 0, 0)).clone()
-    cameraDirection.applyMatrix4(rotationMatrix);
-    const raycaster = new THREE.Raycaster(this.camera.position.clone(), cameraDirection, 0, 5);
+    const target = this.camera
+    const targetDirection = target.getWorldDirection(new THREE.Vector3(0, 0, 0)).clone()
+    targetDirection.applyMatrix4(rotationMatrix);
+    const raycaster = new THREE.Raycaster(target.position.clone(), targetDirection, 0, 5);
+    raycaster.ray.origin.y -= this._eyeHeight;
     const intersectObjects = this._intersectIDs.map(x => (store.uidMap[x]).child)
     const intersections = raycaster.intersectObjects(intersectObjects, true);
     return intersections.length;
@@ -147,10 +152,11 @@ export default class FirstPersonControlNode extends PrimitiveNode {
 
   update = () => {
     const time = performance.now();
-    if (this.control.isLocked ===true) {
+    if (this.control.isLocked === true) {
       const raycaster = this._raycaster
-      raycaster.ray.origin.copy(this.camera.position);
-      // raycaster.ray.origin.y -= this._eyeHeight;
+      const target = this.camera
+      raycaster.ray.origin.copy(target.position);
+      raycaster.ray.origin.y -= this._eyeHeight;
       const intersectObjects = this._intersectIDs.map(x => (store.uidMap[x]).child)
       const intersections = raycaster.intersectObjects(intersectObjects, true);
       const onObject = intersections.length;
@@ -168,7 +174,6 @@ export default class FirstPersonControlNode extends PrimitiveNode {
       const velocity = this._velocity
       const controls = this.control
       const eyeHeight = this._eyeHeight
-      const camera = this.camera
 
       if (moveForward) {
         forwardCollide = this._collideCheck(0);
@@ -202,6 +207,7 @@ export default class FirstPersonControlNode extends PrimitiveNode {
       if (onObject) {
         velocity.y = Math.max(0, velocity.y);
         this._canJump = true;
+        console.log('碰着', intersections)
       }
       const quicken = this._pressShift ? this._a : 1;
 
@@ -209,10 +215,12 @@ export default class FirstPersonControlNode extends PrimitiveNode {
       let forwardDistance = -velocity.z * delta * quicken;
 
       if ((moveRight && rightCollide) || (moveLeft && leftCollide)) {
+        console.log('碰到左右')
         rightDistance = 0;
       }
 
       if ((moveForward && forwardCollide) || (moveBackward && backCollide)) {
+        console.log('碰到前后')
         forwardDistance = 0;
       }
 
@@ -220,10 +228,10 @@ export default class FirstPersonControlNode extends PrimitiveNode {
 
       if (moveForward || moveBackward) controls.moveForward(forwardDistance);
 
-      camera.position.y += velocity.y * delta;
-      if (camera.position.y < eyeHeight) {
+      target.position.y += velocity.y * delta;
+      if (target.position.y < eyeHeight) {
         velocity.y = 0;
-        camera.position.y = eyeHeight;
+        target.position.y = eyeHeight;
         this._canJump = true;
       }
     }

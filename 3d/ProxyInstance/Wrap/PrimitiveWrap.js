@@ -1,7 +1,7 @@
 import _constant from "../../constant";
 import _ from "lodash"
 import { firstToLowercase, firstToUppercase } from "../../Util"
-
+import * as THREE from 'three'
 let id = 0;
 const exclude = _constant.excludeList;
 export default class PrimitiveWrap {
@@ -25,12 +25,12 @@ export default class PrimitiveWrap {
 
   onParentMounted(parentAstItem) {
     const parentNode = _.get(parentAstItem, _constant.node, _.get(parentAstItem, _constant.child))
-    const child = this.group || this.node
+    const child = this.wrap || this.node
     if (exclude.includes(this.type)) {
       return
     }
     if (_constant.grandAddList.includes(this.type)) {
-      const parentNode = _.get(parentAstItem, _constant.node, _.get(parentAstItem, _constant.group))
+      const parentNode = _.get(parentAstItem, _constant.node, _.get(parentAstItem, _constant.wrap))
       if (child && parentNode?.parent) {
         parentNode.parent.add(child)
         return
@@ -45,7 +45,7 @@ export default class PrimitiveWrap {
     this._level = x;
   }
 
-  proxyData(arr = [['group', ''], ['child', 'inner']]) {
+  proxyData(arr = [['wrap', ''], ['child', 'inner']]) {
     for (const [target, prefix] of arr) {
       for (const pAttr of ['position', 'rotation', 'scale']) {
         this.registerAttr(target, pAttr, prefix)
@@ -59,6 +59,12 @@ export default class PrimitiveWrap {
       Object.defineProperty(this, attr, {
         set(v) {
           Reflect.set(this[target][pAttr], dim, v)
+          if (target === 'child') {
+            if (dim === 'y' && pAttr === 'position' && ['Model'].includes(this.type)) {
+              v += new THREE.Box3().setFromObject(this.child).getSize(new THREE.Vector3()).y / 2
+            }
+            Reflect.set(this['box3'][pAttr], dim, v)
+          }
         },
         get() {
           return Reflect.get(this[target][pAttr], dim)

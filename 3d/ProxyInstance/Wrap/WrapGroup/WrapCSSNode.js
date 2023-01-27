@@ -5,8 +5,12 @@ import WrapGroupNode from "./WrapGroupNode"
 class WrapCSSNode extends WrapGroupNode {
   constructor(group, config) {
     super(group, config, {
-      selfAttr: [...Reflect.ownKeys(WrapCSSNode.prototype), '_domEl', '_elProps', '_handlerEventListener'],
+      selfAttr: [...Reflect.ownKeys(WrapCSSNode.prototype), '_initHandle', 'addEvent', 'removeEvent', '_domEl', '_elProps', '_handlerEventListener'],
     })
+    this._initHandle(config)
+  }
+
+  _initHandle = (config) => {
     this._domEl = config.domEl
     this._elProps = config.elProps
     this._handlerEventListener = []
@@ -20,15 +24,16 @@ class WrapCSSNode extends WrapGroupNode {
         })
       }
     }
+    this.addEvent()
   }
 
-  addEvent() {
+  addEvent = () => {
     for (const { type, handler } of this._handlerEventListener) {
       this._domEl.addEventListener(type, handler)
     }
   }
 
-  removeEvent() {
+  removeEvent = () => {
     for (const { type, handler } of this._handlerEventListener) {
       this._domEl.removeEventListener(type, handler)
     }

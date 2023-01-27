@@ -28,12 +28,17 @@ const CSS3DObject = function (props, ref) {
       el.style.pointerEvents = 'auto';
       el.style.cursor = 'pointer';
       const node = new CSS3DObject2(el)
-      const group = new THREE.Group()
-      group.add(node)
-      const ret = new WrapCSSNode(group, { ...config, domEl: el, elProps: props })
-      ret.addEvent()
-      promiseWrap.resolve(ret)
-
+      const newConfig = { ...config, domEl: el, elProps: props }
+      if (!promiseWrap.child) {
+        const group = new THREE.Group()
+        group.add(node)
+        const ret = new WrapCSSNode(group,newConfig )
+        promiseWrap.resolve(ret)
+      } else {
+        promiseWrap._changeChild(node)
+        promiseWrap.removeEvent()
+        promiseWrap._initHandle(newConfig)
+      }
     }
   }}>
     {props.children}

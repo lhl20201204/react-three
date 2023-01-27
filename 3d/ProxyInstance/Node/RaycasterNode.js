@@ -18,6 +18,7 @@ export default class RaycasterNode extends PrimitiveNode {
     this._handles = []
     this._lastUniqIntersects = []
     this._listenerMethodNameList = []
+    this._penetrate = _.get(this.props, 'noPenetrate', false)
   }
 
   checkTouchElement = (type) => () => {
@@ -26,7 +27,10 @@ export default class RaycasterNode extends PrimitiveNode {
     }
     const mouse = this._mouse
     this.raycaster.setFromCamera(mouse, this.camera);
-    const intersects = this.raycaster.intersectObjects(this.scene.children, true).reverse()
+    let intersects = this.raycaster.intersectObjects(this.scene.children, true)
+    if (!this._penetrate) {
+      intersects = intersects.slice(0, 1)
+    }
     if (intersects) {
       this.promiseWrap?.props?.[type]?.(intersects)
     }
