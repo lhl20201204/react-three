@@ -1,7 +1,7 @@
 import _constant from "../../constant";
 import _ from "lodash"
 import { firstToLowercase, firstToUppercase } from "../../Util"
-import * as THREE from 'three'
+
 let id = 0;
 const exclude = _constant.excludeList;
 export default class PrimitiveWrap {
@@ -53,6 +53,8 @@ export default class PrimitiveWrap {
     }
   }
 
+  _isModelType = () => ['Model'].includes(this.type)
+
   registerAttr(target, pAttr, prefix) {
     for (const dim of ['x', 'y', 'z']) {
       const attr = firstToLowercase([prefix, pAttr === 'position' ? '' : pAttr, dim].map(x => firstToUppercase(x)).join(''))
@@ -60,10 +62,10 @@ export default class PrimitiveWrap {
         set(v) {
           Reflect.set(this[target][pAttr], dim, v)
           if (target === 'child') {
-            if (dim === 'y' && pAttr === 'position' && ['Model'].includes(this.type)) {
-              v += new THREE.Box3().setFromObject(this.child).getSize(new THREE.Vector3()).y / 2
+            if (dim === 'y' && pAttr === 'position' && this._isModelType()) {
+              v += this._boxSizeVec3.y / 2
             }
-            Reflect.set(this['box3'][pAttr], dim, v)
+            this.box3[pAttr][dim] = v
           }
         },
         get() {

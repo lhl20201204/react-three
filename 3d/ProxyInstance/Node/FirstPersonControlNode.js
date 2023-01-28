@@ -136,6 +136,8 @@ export default class FirstPersonControlNode extends PrimitiveNode {
     document.removeEventListener("keyup", this._onKeyUp);
   }
 
+  _getIntersectObjects = () => _.flatten(this._intersectIDs.map(x => (store.uidMap[x])?.wrap?.userData?.[_constant.__needRaycasterChildren__] || [])) 
+
   _collideCheck = (angle) => {
     let rotationMatrix = new THREE.Matrix4();
     //射线方向设置为对应按键移动方向
@@ -145,8 +147,8 @@ export default class FirstPersonControlNode extends PrimitiveNode {
     targetDirection.applyMatrix4(rotationMatrix);
     const raycaster = new THREE.Raycaster(target.position.clone(), targetDirection, 0, 5);
     raycaster.ray.origin.y -= this._eyeHeight;
-    const intersectObjects = this._intersectIDs.map(x => (store.uidMap[x]).child)
-    const intersections = raycaster.intersectObjects(intersectObjects, true);
+    const intersectObjects = this._getIntersectObjects()
+    const intersections = raycaster.intersectObjects(intersectObjects, false);
     return intersections.length;
   }
 
@@ -157,8 +159,8 @@ export default class FirstPersonControlNode extends PrimitiveNode {
       const target = this.camera
       raycaster.ray.origin.copy(target.position);
       raycaster.ray.origin.y -= this._eyeHeight;
-      const intersectObjects = this._intersectIDs.map(x => (store.uidMap[x]).child)
-      const intersections = raycaster.intersectObjects(intersectObjects, true);
+      const intersectObjects =this._getIntersectObjects()
+      const intersections = raycaster.intersectObjects(intersectObjects, false);
       const onObject = intersections.length;
       //四个方位是否产生碰撞
       let leftCollide = [];

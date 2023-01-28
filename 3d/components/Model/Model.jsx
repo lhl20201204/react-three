@@ -8,6 +8,8 @@ import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
 import { ModelNode, WrapModelNode } from "../../ProxyInstance";
 const store = getStore();
 
+const getSize = (model) => new THREE.Box3().setFromObject(model, true).getSize(new THREE.Vector3())
+
 const Model = function (props, ref) {
   const actionsRef = useRef([])
   const actionRef = useRef({})
@@ -21,10 +23,11 @@ const Model = function (props, ref) {
       }
       const group = new THREE.Group()
       const model = SkeletonUtils.clone(object.scene || object);
+   
       const mixer = new THREE.AnimationMixer(model);
       const onAnimationsLoad = _.get(props, 'onAnimationsLoad');
       const animations = _.get(props, 'animations') || {}
-      let i = 0;
+      let i = 0; 
       for (const aname in animations) {
         const obj = store.resourceMap[animations[aname]]
         if (!obj) {
@@ -52,12 +55,13 @@ const Model = function (props, ref) {
       }
       actionsRef.current = actions;
       const instance = new ModelNode({ model, mixer, actions }, config)
-      store.pushModel(instance)
       group.add(model)
-      return new WrapModelNode(group, { ...config, instance });
+      const ret = new WrapModelNode(group, { ...config, instance })
+      store.pushModel(ret)
+      return ret;
     },
     onDestroy(promiseWrap) {
-      if (!store.deleteModel(promiseWrap?.instance)) {
+      if (!store.deleteModel(promiseWrap?.$value)) {
         throw new Error('删除失败')
       }
       actionsRef.current = []
@@ -74,7 +78,8 @@ const Model = function (props, ref) {
         if ([i, name].includes(seletedAction)) {
           actionRef.current = action;
           action.play()
-          configRef.current.promiseWrap._changeBox3?.() // 待解决
+          const pw = configRef.current.promiseWrap
+          // pw._changeBox3?.() // 待解决
         }
       }
     }

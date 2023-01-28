@@ -1,5 +1,6 @@
 import _ from "lodash";
 import _constant from "../constant";
+import { getNeedRaycasterChildren } from "../Util";
 import { findNode } from "./findNode";
 import { _render } from "./render";
 import { getStore } from "./store";
@@ -15,6 +16,8 @@ export function mount() {
         const sceneItems = findNode({ type: _constant.sceneList }, store.tree);
         for (const sceneItem of sceneItems) {
           traverseAstNode(sceneItem)
+          const scene = _.get(sceneItem, _constant.node)
+          scene.userData[_constant.__needRaycasterChildren__] = getNeedRaycasterChildren(scene)
         }
         await store.runPromiseWrapList()
         requestAnimationFrame(_render)

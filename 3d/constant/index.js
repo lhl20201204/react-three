@@ -54,5 +54,7 @@ const _constant = {
   wrapName: 'wrap',
   __proxy__,
   __type__,
+  __needRaycasterChildren__: '$$__needRaycasterChildren__',
+  __wrapFlag__: '__$$__Of__Wrap',
 }
 export default _constant

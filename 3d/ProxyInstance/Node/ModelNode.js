@@ -8,4 +8,7 @@ export default class ModelNode extends PrimitiveNode{
      this.actions = _.get(res, 'actions')
   }
 
+  update(t) {
+    this.mixer.update(t)
+  }
 }

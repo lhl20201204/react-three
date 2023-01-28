@@ -50,7 +50,7 @@ class Store {
   nameStack = []
   tree = {}
   promiseResultList = []
-
+  
   setDomElement(x) {
     this.domElement = x;
   }

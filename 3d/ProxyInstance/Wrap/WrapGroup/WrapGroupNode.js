@@ -5,6 +5,7 @@ import { Stride } from "../../Helper"
 import PrimitiveWrap from "../PrimitiveWrap"
 import * as THREE from 'three'
 import { Vector3 } from "three"
+import { getNeedRaycasterChildren } from "../../../Util"
 
 class WrapGroupNode extends PrimitiveWrap {
   constructor(wrap, config, option) {
@@ -12,8 +13,9 @@ class WrapGroupNode extends PrimitiveWrap {
     this.wrap = wrap
     this.child = _.get(wrap, 'children.0')
     this._setBox3()
-    this.wrap.userData[_constant.__type__] = _.get(config, 'type') + '_of_Wrap'
-    this.wrap.userData[_constant.__proxy__] = this
+    this.wrap.userData[_constant.__type__] = _.get(config, 'type') + _constant.__wrapFlag__
+    this.wrap.userData[_constant.__proxy__] = this  
+    this._setRaycasterChildren()
     const appendUserData = (x) => {
       if (x.userData[_constant.__isBox3__]) {
         return
@@ -64,19 +66,30 @@ class WrapGroupNode extends PrimitiveWrap {
     })
   }
 
+  _setRaycasterChildren = () => {
+    this.wrap.userData[_constant.__needRaycasterChildren__] = getNeedRaycasterChildren(this.wrap)
+  }
+
   _setBox3 = (boxVisible = false) => {
-    const boxVec3 = new THREE.Box3().setFromObject(this.child).getSize(new Vector3())
+    const box3 = new THREE.Box3().setFromObject(this.child, this._isModelType())
+    const boxVec3 = box3.getSize(new Vector3())
     const box = new THREE.Mesh(new THREE.BoxGeometry(boxVec3.x, boxVec3.y, boxVec3.z), new THREE.MeshBasicMaterial({
       wireframe: true,
       color: 'red'
     }))
-    if (['Model'].includes(this.type)) {
-      box.position.y = this.child.position.y + boxVec3.y / 2
+    box.position.copy(this.child.position)
+    if (this._isModelType()) {
+      box.position.y += boxVec3.y / 2
+      console.log(boxVec3)
     }
+    box.scale.copy(this.child.scale)
+    box.quaternion.copy(this.child.quaternion)
+    box.rotation.copy(this.child.rotation)
     box.visible = boxVisible;
     box.userData[_constant.__isBox3__] = true
     this.box3 = box
     this.wrap.add(box)
+    this._boxSizeVec3 = boxVec3;
   }
 
   _changeBox3 = () => {
@@ -88,6 +101,7 @@ class WrapGroupNode extends PrimitiveWrap {
     this.child.removeFromParent()
     this.wrap.add(node)
     this.child = node;
+    this._setRaycasterChildren()
   }
 
   lookAt = (...args) => {

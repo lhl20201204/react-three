@@ -6,7 +6,6 @@ import usePromiseWrap from "../../Hook/usePromiseWrap";
 import _constant from "../../constant";
 import { FirstPersonControlNode, WrapSelfNode } from "../../ProxyInstance";
 import { getStore } from "../../core/store";
-import * as THREE from 'three';
 
 const store = getStore()
 const FirstPersonControls = function (props, ref) {

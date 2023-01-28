@@ -86,6 +86,7 @@ export default () => {
     </Box>)
   // 士兵
   const solider = <Model
+    boxVisible
     uid="soldier"
     {...getScale(4)}
     src='./Soldier.glb'
@@ -103,7 +104,7 @@ export default () => {
   </Model>
   // 狐狸
   const fox = <Model
-  boxVisible
+    boxVisible
     uid="fox"
     {...getPosition(foxRef)}
     src={'./Fox.fbx'}
@@ -150,9 +151,12 @@ export default () => {
   const cube = <Box
     y={2}
     map={'./top.webp'}
-    onUpdate={(obj) => {
+    onUpdate={(obj, { clock }) => {
       obj.innerRotationX += 0.01
       obj.innerRotationY += 0.01
+      const delta = clock.oldTime / 1000
+      obj.x = Math.sin(delta)
+      obj.z = Math.cos(delta)
     }}
     boxVisible
   >
@@ -183,7 +187,18 @@ export default () => {
           ref={controlRef}
           intersectIDs={['floor', 'fox', 'wall']}
           onUnLock={() => setBtnShow(true)}
-        />
+        > <div style={{
+          height: '100vh',
+          display: 'flex', justifyContent: 'center', alignItems: 'center'
+        }}>
+            <button style={{ display: btnShow ? 'inline-block' : 'none' }} onClick={() => {
+              controlRef.current.lock()
+              setBtnShow(false)
+            }}>
+              进入第一人称视角
+            </button>
+          </div>
+        </FirstPersonControls>
         {/* <OrbitControls /> */}
         <CSS2DRenderer pointerEvents={'none'} />
         {camera}
@@ -227,17 +242,6 @@ export default () => {
         <Raycaster />
         {camera}
       </Container>
-      <div style={{
-        height: '100vh',
-        display: 'flex', justifyContent: 'center', alignItems: 'center'
-      }}>
-        <button style={{ display: btnShow ? 'inline-block' : 'none' }} onClick={() => {
-          controlRef.current.lock()
-          setBtnShow(false)
-        }}>
-          进入第一人称视角
-        </button>
-      </div>
     </World>
   )
 }

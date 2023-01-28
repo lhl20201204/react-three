@@ -1,4 +1,5 @@
 import _ from "lodash"
+import _constant from "../constant"
 
 const firstTo = (m) => (str) => {
   if (!str) {
@@ -13,7 +14,7 @@ export const firstToLowercase = firstTo('toLowerCase')
 
 export const mixColor = (arr1, arr2, r2) => {
   const r1 = 1 - r2
-  const f = (i) =>  Math.floor((arr1[i]) * (r1)+ (arr2[i]) * (r2))
+  const f = (i) => Math.floor((arr1[i]) * (r1) + (arr2[i]) * (r2))
   return `rgb(${f(0)},${f(1)},${f(2)})`
 }
 
@@ -25,10 +26,24 @@ export const getScale = (x) => (
   }
 )
 
-export const getPosition  = (ref, c) => {
+export const getPosition = (ref, c) => {
   return {
     x: _.get(ref, 'current.x', c?.x ?? 0),
     y: _.get(ref, 'current.y', c?.y ?? 0),
     z: _.get(ref, 'current.z', c?.z ?? 0)
   }
+}
+
+export const getNeedRaycasterChildren = (obj) => {
+  const ret = []
+  obj.traverse((x) => {
+    if (x.isScene
+      || x?.userData?.[_constant.__isBox3__]
+      || x?.userData?.[_constant.__type__]?.endsWith?.(_constant.__wrapFlag__)
+    ) {
+      return
+    }
+    ret.push(x)
+  })
+  return ret;
 }

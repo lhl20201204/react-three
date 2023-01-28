@@ -3,6 +3,7 @@ import { traverseAstNode } from "./traverseAstNode";
 import { findNode } from "./findNode";
 import { _render } from "./render";
 import { getStore } from "./store";
+import { getNeedRaycasterChildren } from "../Util";
 
 const store = getStore()
 
@@ -19,6 +20,8 @@ export function update() {
     }
     for(const sceneItem of sceneItems) {
        traverseAstNode(sceneItem)
+       const scene = _.get(sceneItem, _constant.node)
+       scene.userData[_constant.__needRaycasterChildren__] = getNeedRaycasterChildren(scene)
     }
     store.runPromiseWrapList().then(() => requestAnimationFrame(_render))
   })();

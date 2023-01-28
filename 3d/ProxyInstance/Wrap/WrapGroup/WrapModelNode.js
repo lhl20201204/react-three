@@ -12,6 +12,10 @@ class WrapModelNode extends WrapGroupNode {
     }
     this.instance = _.get(config, 'instance')
   }
+
+  update(t) {
+    this.instance.update(t)
+  }
 }
 
 export default WrapModelNode

@@ -60,9 +60,21 @@ export default () => {
               }
             }
           }}
-        />
+        >
+          <div style={{
+            height: '100vh',
+            display: 'flex', justifyContent: 'center', alignItems: 'center'
+          }}>
+            <button style={{ display: btnShow ? 'inline-block' : 'none' }} onClick={() => {
+              controlRef.current.lock()
+              setBtnShow(false)
+            }}>
+              进入第三人称视角
+            </button>
+          </div>
+        </FirstPersonControls>
         {/* <OrbitControls /> */}
-        <PerspectiveCamera ref={cameraRef} {...getPosition(cameraRef, {y: 5, z:20})}
+        <PerspectiveCamera ref={cameraRef} {...getPosition(cameraRef, { y: 5, z: 20 })}
           subscribe={
             {
               watch: ['followCamera', 'Soldier'],
@@ -86,6 +98,7 @@ export default () => {
             ref={soliderRef}
             uid='Soldier'
             innerY={3}
+            innerX={3}
             // innerRotationY={-Math.PI}
             src='./Soldier.glb'
             onAnimationsLoad={console.log}
@@ -105,17 +118,7 @@ export default () => {
           </Model>
         </Scene>
       </Container>
-      <div style={{
-        height: '100vh',
-        display: 'flex', justifyContent: 'center', alignItems: 'center'
-      }}>
-        <button style={{ display: btnShow ? 'inline-block' : 'none' }} onClick={() => {
-          controlRef.current.lock()
-          setBtnShow(false)
-        }}>
-          进入第三人称视角
-        </button>
-      </div>
+
     </World>
   )
 }

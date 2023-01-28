@@ -40,7 +40,7 @@ export default () => {
             onAnimationsLoad={console.log}
             action={action}
             onUpdate={(x) => {
-              x.moveForward(0.04)
+              x.goToLookAt(0.04)
               if (x.distVec > 0 && action === 'Idle') {
                 setAction('Walk')
               } else if (x.distVec === 0 && action === 'Walk') {
