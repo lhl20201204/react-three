@@ -1,4 +1,5 @@
 import _ from "lodash"
+import * as THREE from 'three'
 import _constant from "../constant"
 
 const firstTo = (m) => (str) => {
@@ -26,11 +27,49 @@ export const getScale = (x) => (
   }
 )
 
+export const getRotation = (x) => (
+  {
+    rotationX: x,
+    rotationY: x,
+    rotationZ: x,
+  }
+)
+
+export const getInnerRotation = (x) => (
+  {
+    innerRotationX: x,
+    innerRotationY: x,
+    innerRotationZ: x,
+  }
+)
+
 export const getPosition = (ref, c) => {
+  if (typeof ref === 'number') {
+    return {
+      x: ref,
+      y: ref,
+      z: ref,
+    }
+  }
   return {
     x: _.get(ref, 'current.x', c?.x ?? 0),
     y: _.get(ref, 'current.y', c?.y ?? 0),
     z: _.get(ref, 'current.z', c?.z ?? 0)
+  }
+}
+
+export const getInnerPosition = (ref, c) => {
+  if (typeof ref === 'number') {
+    return {
+      innerX: ref,
+      innerY: ref,
+      innerZ: ref,
+    }
+  }
+  return {
+    innerX: _.get(ref, 'current.innerX', c?.x ?? 0),
+    innerY: _.get(ref, 'current.innerY', c?.y ?? 0),
+    innerZ: _.get(ref, 'current.innerZ', c?.z ?? 0)
   }
 }
 
@@ -47,3 +86,13 @@ export const getNeedRaycasterChildren = (obj) => {
   })
   return ret;
 }
+
+export const getWorldPointToLocalPosition = (object, vec3) => {
+  if (!object instanceof THREE.Object3D) {
+    return
+  }
+  const parent = object.parent;
+  return vec3.sub(parent.getWorldPosition(new THREE.Vector3())).divide(parent.getWorldScale(new THREE.Vector3(1, 1, 1)))
+}
+
+export const multi = (v1, v2) => new THREE.Vector3(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);

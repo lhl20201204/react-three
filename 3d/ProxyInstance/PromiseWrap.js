@@ -79,6 +79,6 @@ export default class PromiseWrap {
   }
 
   _removeFromParent() {
-    // TODO
+    this.onDestroyed()
   }
 }

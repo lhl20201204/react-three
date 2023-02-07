@@ -35,13 +35,14 @@ export default () => {
         res.scene.traverse(function (object) {
           if (object.isMesh) {
             object.castShadow = true;
+            object.visible = true;
           }
         })
       } 
     }
   })
 
-  const [id, setId] = useState(1)
+  const [id, setId] = useState(5)
   useEffect(() => {
     // const len = Comps.length
     // for(let i = 0; i < len; i++) {

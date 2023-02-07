@@ -1,5 +1,6 @@
 import _constant from "../../constant";
 import _ from "lodash"
+import * as THREE from 'three';
 import { firstToLowercase, firstToUppercase } from "../../Util"
 
 let id = 0;
@@ -41,6 +42,17 @@ export default class PrimitiveWrap {
     }
   }
 
+  onDestroyed() {
+    const parent = this.child || this.node
+    if (parent instanceof THREE.Object3D) {
+      for (const child of parent.children) {
+        if (child.userData?.[_constant.__type__]) {
+          child.parent.remove(child)
+        }
+      }
+    }
+  }
+
   setLevel(x) {
     this._level = x;
   }
@@ -61,12 +73,6 @@ export default class PrimitiveWrap {
       Object.defineProperty(this, attr, {
         set(v) {
           Reflect.set(this[target][pAttr], dim, v)
-          if (target === 'child') {
-            if (dim === 'y' && pAttr === 'position' && this._isModelType()) {
-              v += this._boxSizeVec3.y / 2
-            }
-            this.box3[pAttr][dim] = v
-          }
         },
         get() {
           return Reflect.get(this[target][pAttr], dim)

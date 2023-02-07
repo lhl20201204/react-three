@@ -1,7 +1,7 @@
 import _ from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { Vector3 } from "three";
-import { Scene, AmbientLight, AxesHelper, Box, Container, CSS2DObject, CSS2DRenderer, CSS3DObject, CSS3DRenderer, Field, mixColor, Model, OrbitControls, PerspectiveCamera, Raycaster, Sphere, THREE, TrackballControls, useLoop, usePreload, WebGLRenderer, World, getScale, SkeletonHelper, HemisphereLight, DirectionalLight, getPosition, FirstPersonControls } from "../3d";
+import { Scene, AmbientLight, AxesHelper, Box, Container, CSS2DObject, CSS2DRenderer, CSS3DObject, CSS3DRenderer, Field, mixColor, Model, OrbitControls, PerspectiveCamera, Raycaster, Sphere, THREE, TrackballControls, useLoop, usePreload, WebGLRenderer, World, getScale, SkeletonHelper, HemisphereLight, DirectionalLight, getPosition, FirstPersonControls, getInnerPosition } from "../3d";
 const rand = x => Math.floor(Math.random() * x)
 const getC = () => `rgb(${rand(255)}, ${rand(255)}, ${rand(255)})`
 const skyboxUrl = [
@@ -42,7 +42,7 @@ export default () => {
     }, 2000)
     setTimeout(() => {
       setShow(2)
-    }, 6000)
+    }, 3000)
   }, [])
 
   useLoop(({ t }) => {
@@ -52,8 +52,8 @@ export default () => {
     const { current: css2d } = css2dRef
     // 将立方体颜色自动变化
     boxMaterial.color = mixColor([125, 125, 125], [0, 255, 255], Math.abs(sin / 3))
-    css2d.x = 0.5 * (sin - 0.5)
-    css2d.z = 0.5 * (cos - 0.5)
+    // css2d.x = 0.5 * (sin - 0.5)
+    // css2d.z = 0.5 * (cos - 0.5)
   })
   // 相机
   const camera = <PerspectiveCamera ref={cameraRef}
@@ -106,9 +106,13 @@ export default () => {
   const fox = <Model
     boxVisible
     uid="fox"
-    {...getPosition(foxRef)}
+    {...getPosition(foxRef, { x: 5, z: 5})}
+    {...getInnerPosition(foxRef, { x: -10, })}
     src={'./Fox.fbx'}
-    {...getScale(1 / 100)}
+    {...getScale(0.1)}
+    innerScaleX={0.1}
+    innerScaleY={0.1}
+    innerScaleZ={0.1}
     ref={foxRef}
     animations={{ idle: "./Idle.fbx", walking: "./Walking.fbx", soldier: './Soldier.glb' }}
     action={action}
@@ -213,7 +217,9 @@ export default () => {
           {light}
           {ground}
           {solider}
+          <Box {...getScale(1.2)} >
           {fox}
+          </Box>
           {cube}
           <AxesHelper size={100} />
           {earth}

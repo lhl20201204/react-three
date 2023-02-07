@@ -11,11 +11,12 @@ export default class FirstPersonControlNode extends PrimitiveNode {
     super(config)
     if (res.control instanceof PointerLockControls) {
       this.control = res.control
+      this.minPolarAngle = Math.PI / 4; // radians
+      this.maxPolarAngle = 5 * Math.PI / 4; // radians
     } else {
       throw new Error('control 初始化失败')
     }
     this.camera = res.camera;
-
     this._eyeHeight = _.get(this.props, 'eyeHeight', 5)
     this._jumpHeight = _.get(this.props, 'jumpHeight ', 200)
     this._continueJump = _.get(this.props, 'continueJump', false)
@@ -209,7 +210,7 @@ export default class FirstPersonControlNode extends PrimitiveNode {
       if (onObject) {
         velocity.y = Math.max(0, velocity.y);
         this._canJump = true;
-        console.log('碰着', intersections)
+        // console.log('碰着', intersections)
       }
       const quicken = this._pressShift ? this._a : 1;
 

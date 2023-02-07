@@ -73,7 +73,7 @@ export default () => {
             </button>
           </div>
         </FirstPersonControls>
-        {/* <OrbitControls /> */}
+        <OrbitControls />
         <PerspectiveCamera ref={cameraRef} {...getPosition(cameraRef, { y: 5, z: 20 })}
           subscribe={
             {
@@ -99,6 +99,7 @@ export default () => {
             uid='Soldier'
             innerY={3}
             innerX={3}
+            innerZ={3}
             // innerRotationY={-Math.PI}
             src='./Soldier.glb'
             onAnimationsLoad={console.log}
@@ -114,7 +115,7 @@ export default () => {
               // }
             }}
           >
-            <Box uid="followCamera" y={4} z={4} visible={false}></Box>
+            <Box uid="followCamera" y={4} z={4} visible={true} boxVisible></Box>
           </Model>
         </Scene>
       </Container>

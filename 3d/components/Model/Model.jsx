@@ -79,7 +79,7 @@ const Model = function (props, ref) {
           actionRef.current = action;
           action.play()
           const pw = configRef.current.promiseWrap
-          // pw._changeBox3?.() // 待解决
+          pw._changeBox3?.() // 待解决
         }
       }
     }
