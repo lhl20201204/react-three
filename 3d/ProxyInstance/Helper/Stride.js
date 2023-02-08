@@ -10,8 +10,8 @@ export class Stride { // 先通过代理proxy挂,后续改成继承
   }
 
   _setDestinationVec3 = (x, y, z) => {
-    let desVec3 = x instanceof THREE.Vector3 ? x : new THREE.Vector3(x??0, y??0, z??0);
-    desVec3 = getWorldPointToLocalPosition(this.pw.wrap, desVec3)
+    let input = x instanceof THREE.Vector3 ? x : new THREE.Vector3(x??0, y??0, z??0);
+    let desVec3 = getWorldPointToLocalPosition(this.pw.wrap, input)
     let oriVec3 = new THREE.Vector3(this.pw.x, this.pw.y, this.pw.z);
     this.distVec = desVec3.distanceTo(oriVec3)
     this.desVec3 = desVec3;

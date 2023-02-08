@@ -92,7 +92,9 @@ export const getWorldPointToLocalPosition = (object, vec3) => {
     return
   }
   const parent = object.parent;
-  return vec3.sub(parent.getWorldPosition(new THREE.Vector3())).divide(parent.getWorldScale(new THREE.Vector3(1, 1, 1)))
+  return new THREE.Vector3()
+  .copy(vec3)
+  .sub(parent.getWorldPosition(new THREE.Vector3()))
+  .divide(parent.getWorldScale(new THREE.Vector3(1, 1, 1)))
+  .applyQuaternion(parent.getWorldQuaternion(new THREE.Quaternion()).invert())
 }
-
-export const multi = (v1, v2) => new THREE.Vector3(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);

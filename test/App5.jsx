@@ -43,7 +43,7 @@ export default () => {
           intersectIDs={['floor']}
           onUnLock={() => setBtnShow(true)}
           targetId="Soldier"
-          eyeHeight={1.8322028172779816}
+          eyeHeight={0}
           speed={5}
           speedStep={0.1}
           onKeyDown={x => {
@@ -73,7 +73,7 @@ export default () => {
             </button>
           </div>
         </FirstPersonControls>
-        <OrbitControls />
+        {/* <OrbitControls /> */}
         <PerspectiveCamera ref={cameraRef} {...getPosition(cameraRef, { y: 5, z: 20 })}
           subscribe={
             {
@@ -88,7 +88,7 @@ export default () => {
           }
         />
         <WebGLRenderer />
-        {/* <OrbitControls /> */}
+        <OrbitControls />
         <Scene skybox={skyboxUrl}>
           <AxesHelper />
           <HemisphereLight />
@@ -97,7 +97,6 @@ export default () => {
             boxVisible
             ref={soliderRef}
             uid='Soldier'
-            innerY={3}
             innerX={3}
             innerZ={3}
             // innerRotationY={-Math.PI}

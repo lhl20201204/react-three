@@ -5,6 +5,7 @@ import { Stride } from "../../Helper"
 import PrimitiveWrap from "../PrimitiveWrap"
 import * as THREE from 'three'
 import { getNeedRaycasterChildren, multi } from "../../../Util"
+window.THREE = THREE;
 
 class WrapGroupNode extends PrimitiveWrap {
   constructor(wrap, config, option) {
@@ -15,19 +16,7 @@ class WrapGroupNode extends PrimitiveWrap {
     this.wrap.userData[_constant.__type__] = _.get(config, 'type') + _constant.__wrapFlag__
     this.wrap.userData[_constant.__proxy__] = this
     this._setRaycasterChildren()
-    const appendUserData = (x, level = 0) => {
-      if (x.userData[_constant.__isBox3__]) {
-        return
-      }
-      x.userData[_constant.__stride__] = new Stride(this)
-      x.userData[_constant.__type__] = _.get(config, 'type') + (level ? '__' + level : '')
-      x.userData[_constant.__proxy__] = this
-      x.userData[_constant.__isHovering__] = false
-      for (const c of x.children) {
-        appendUserData(c, level + 1)
-      }
-    }
-    appendUserData(this.child)
+    this._appendUserData(this.child)
     this.proxyData()
     const selfAttr = _.uniq([
       ...Reflect.ownKeys(this),
@@ -65,6 +54,19 @@ class WrapGroupNode extends PrimitiveWrap {
     })
   }
 
+  _appendUserData = (x, level = 0) => {
+    if (x.userData[_constant.__isBox3__]) {
+      return
+    }
+    x.userData[_constant.__stride__] = new Stride(this)
+    x.userData[_constant.__type__] = this.type + (level ? '__' + level : '')
+    x.userData[_constant.__proxy__] = this
+    x.userData[_constant.__isHovering__] = false
+    for (const c of x.children) {
+      this._appendUserData(c, level + 1)
+    }
+  }
+
   _setRaycasterChildren = () => {
     this.wrap.userData[_constant.__needRaycasterChildren__] = getNeedRaycasterChildren(this.wrap)
   }
@@ -74,8 +76,8 @@ class WrapGroupNode extends PrimitiveWrap {
   _setBox3 = (boxVisible = false) => {
     const unVisibleChildren = []
     for (const c of this.child.children) {
-      if (this._isCustomObject3d(c) && c.children.some(x => !x.visible && this._isCustomObject3d(x))) {
-        // console.log('有孩子')
+      if (this._isCustomObject3d(c) && c.children.some(x => (!x.visible || x.isCSS2DObject || x.isCSS3DObject ) && this._isCustomObject3d(x))) { 
+        // 2d 跟3d 先暂时不算
         c.removeFromParent()
         unVisibleChildren.push(c)
       }
@@ -84,34 +86,29 @@ class WrapGroupNode extends PrimitiveWrap {
     for (const c of unVisibleChildren) {
       this.child.add(c)
     }
-    const boxVec3 = box3.getSize(new THREE.Vector3())
-    const box = new THREE.Mesh(new THREE.BoxGeometry(boxVec3.x, boxVec3.y, boxVec3.z), new THREE.MeshBasicMaterial({
+    const boxSizeVec3 = box3.getSize(new THREE.Vector3())
+    const box = new THREE.Mesh(new THREE.BoxGeometry(boxSizeVec3.x, boxSizeVec3.y, boxSizeVec3.z), new THREE.MeshBasicMaterial({
       wireframe: true,
       color: 'red'
     }))
-    // const originPositon = this.child.getWorldPosition(new THREE.Vector3())
-    // box.quaternion.copy(this.child.quaternion)
-
     box.visible = boxVisible;
     box.userData[_constant.__isBox3__] = true
     this.box3 = box
     this.child.add(box)
-    const childPosition = this.child.getWorldPosition(new THREE.Vector3());
+    const childWorldPosition = this.child.getWorldPosition(new THREE.Vector3());
     box.scale.copy(new THREE.Vector3(1, 1, 1).divide( this.child.getWorldScale(new THREE.Vector3(1, 1, 1))))
-    const relativeWorldPosition = box3.getCenter(new THREE.Vector3()).sub(childPosition)
-    box.position.copy(multi(relativeWorldPosition, box.scale))
-    box.quaternion.copy(this.child.getWorldQuaternion(new THREE.Quaternion()))
+    const boxWorldQuaternion = this.child.getWorldQuaternion(new THREE.Quaternion());
+    const relativeWorldPosition = box3.getCenter(new THREE.Vector3()).sub(childWorldPosition)
+    box.position.copy(relativeWorldPosition.multiply(box.scale).applyQuaternion(boxWorldQuaternion.invert()))
+    box.quaternion.copy(boxWorldQuaternion)
+
     if (this._isModelType()) {
       console.log('uid:', this.props.uid,
         '点中心位置:', box3.getCenter(new THREE.Vector3()),
-        '模型全局位置:', childPosition,
-        '相对位置：', relativeWorldPosition,
-        box.scale,
-        '盒子位置:', box.position,
         '盒子全局位置:', box.getWorldPosition(new THREE.Vector3()),
       )
     }
-    this._boxSizeVec3 = boxVec3;
+    this._boxSizeVec3 = boxSizeVec3;
   }
 
   _changeBox3 = () => {
@@ -123,6 +120,8 @@ class WrapGroupNode extends PrimitiveWrap {
     this.child.removeFromParent()
     this.wrap.add(node)
     this.child = node;
+    this._appendUserData(this.child)
+    this._changeBox3()
     this._setRaycasterChildren()
   }
 

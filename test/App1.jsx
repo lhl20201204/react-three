@@ -127,6 +127,7 @@ export default () => {
   >
     {/* 狐狸的骨骼 */}
     <SkeletonHelper></SkeletonHelper>
+    <AxesHelper size={100}></AxesHelper>
     <CSS2DObject ref={css2dRef} y={400} onClick={x => {
       console.log(x, '位置坐标点击')
     }}>
@@ -217,7 +218,9 @@ export default () => {
           {light}
           {ground}
           {solider}
-          <Box {...getScale(1.2)} >
+          <Box {...getScale(2)} 
+           rotationX={-Math.PI / 3}
+           rotationY={-Math.PI}>
           {fox}
           </Box>
           {cube}
