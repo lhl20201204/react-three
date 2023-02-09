@@ -98,3 +98,23 @@ export const getWorldPointToLocalPosition = (object, vec3) => {
   .divide(parent.getWorldScale(new THREE.Vector3(1, 1, 1)))
   .applyQuaternion(parent.getWorldQuaternion(new THREE.Quaternion()).invert())
 }
+
+
+export function hadIntersect(obj1, obj2) {
+  const centerCoord = obj1.position.clone()
+  const positions = obj1.geometry.attributes.position
+  const vertices = []
+  for (let i = 0; i < positions.count; i++) {
+    vertices.push(new THREE.Vector3(positions.getX(i), positions.getY(i), positions.getZ(i)))
+  }
+  for (let i = 0; i < vertices.length; i++) {
+    let vertexWorldCoord = vertices[i].clone().applyMatrix4(obj1.matrixWorld)
+    var dir = vertexWorldCoord.clone().sub(centerCoord)
+    let raycaster = new THREE.Raycaster(centerCoord, dir.clone().normalize())
+    let intersects = raycaster.intersectObjects(obj2, true)
+    if (intersects.length > 0 && intersects[0].distance < dir.length()) {
+       return intersects
+    }
+  }
+  return null
+}

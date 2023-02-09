@@ -62,6 +62,7 @@ class WrapGroupNode extends PrimitiveWrap {
     x.userData[_constant.__type__] = this.type + (level ? '__' + level : '')
     x.userData[_constant.__proxy__] = this
     x.userData[_constant.__isHovering__] = false
+    x.userData[_constant.__LastInsections__] = []
     for (const c of x.children) {
       this._appendUserData(c, level + 1)
     }
@@ -73,7 +74,7 @@ class WrapGroupNode extends PrimitiveWrap {
 
   _isCustomObject3d = (x) => !!x.userData?.[_constant.__type__]
 
-  _setBox3 = (boxVisible = false) => {
+  _getBox3 = () => {
     const unVisibleChildren = []
     for (const c of this.child.children) {
       if (this._isCustomObject3d(c) && c.children.some(x => (!x.visible || x.isCSS2DObject || x.isCSS3DObject ) && this._isCustomObject3d(x))) { 
@@ -86,6 +87,11 @@ class WrapGroupNode extends PrimitiveWrap {
     for (const c of unVisibleChildren) {
       this.child.add(c)
     }
+    return box3
+  }
+
+  _setBox3 = (boxVisible = false) => {
+    const box3 = this._getBox3()
     const boxSizeVec3 = box3.getSize(new THREE.Vector3())
     const box = new THREE.Mesh(new THREE.BoxGeometry(boxSizeVec3.x, boxSizeVec3.y, boxSizeVec3.z), new THREE.MeshBasicMaterial({
       wireframe: true,

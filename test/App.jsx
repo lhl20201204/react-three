@@ -7,6 +7,8 @@ import App2 from "./App2";
 import App3 from "./App3";
 import App4 from "./App4";
 import App5 from "./App5";
+import App6 from './App6';
+
 const skyboxUrl = [
   './px.png',
   './nx.png',
@@ -15,7 +17,7 @@ const skyboxUrl = [
   './pz.png',
   './nz.png',
 ]
-const Comps = [App1, App2, App3, App4, App5]
+const Comps = [App1, App2, App3, App4, App5, App6]
 
 export default () => {
   const { progress } = usePreload([
@@ -42,7 +44,7 @@ export default () => {
     }
   })
 
-  const [id, setId] = useState(1)
+  const [id, setId] = useState(6)
   useEffect(() => {
     // const len = Comps.length
     // for(let i = 0; i < len; i++) {

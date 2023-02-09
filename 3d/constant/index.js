@@ -11,7 +11,10 @@ const __type__ = '$$__type__'
 const __isHovering__ = '$$__hovering__'
 const __stride__ = '$$__stride__'
 const __isBox3__ = '$$__isBox3__'
+const __LastInsections__ = '$__LastInsections__'
+
 const _constant = {
+  __LastInsections__,
   __isHovering__,
   __stride__,
   eventList: ['click', 'dblClick', 'mouseDown', 'mouseUp', 'mouseMove'],

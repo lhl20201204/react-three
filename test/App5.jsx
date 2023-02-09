@@ -44,7 +44,7 @@ export default () => {
           onUnLock={() => setBtnShow(true)}
           targetId="Soldier"
           eyeHeight={0}
-          speed={5}
+          speed={1}
           speedStep={0.1}
           onKeyDown={x => {
             if (['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(x)) {
@@ -73,48 +73,32 @@ export default () => {
             </button>
           </div>
         </FirstPersonControls>
-        {/* <OrbitControls /> */}
         <PerspectiveCamera ref={cameraRef} {...getPosition(cameraRef, { y: 5, z: 20 })}
           subscribe={
             {
               watch: ['followCamera', 'Soldier'],
               cb(x, _, y) {
-                // x.position.lerp(y[0].getWorldPosition(new THREE.Vector3()), 1)
-                // const pos = y[1].getWorldPosition(new THREE.Vector3()).clone();
-                // pos.y += 1.8322028172779816
-                // x.lookAt(pos)
+                x.position.lerp(y[0].getWorldPosition(new THREE.Vector3()), 1)
+                const pos = y[1].getWorldPosition(new THREE.Vector3()).clone();
+                pos.y += 3
+                x.lookAt(pos)
               }
             }
           }
         />
         <WebGLRenderer />
-        <OrbitControls />
         <Scene skybox={skyboxUrl}>
           <AxesHelper />
           <HemisphereLight />
           {ground}
           <Model
-            boxVisible
+            // boxVisible
             ref={soliderRef}
             uid='Soldier'
-            innerX={3}
-            innerZ={3}
-            // innerRotationY={-Math.PI}
             src='./Soldier.glb'
-            onAnimationsLoad={console.log}
             action={action}
-            onUpdate={(x) => {
-              // const direction  = x.getWorldDirection(new THREE.Vector3()).clone()
-              // console.log(direction)
-              // x.goToLookAt(0.04)
-              // if (x.distVec > 0 && action === 'Idle') {
-              //   setAction('Walk')
-              // } else if (x.distVec === 0 && action === 'Walk') {
-              //   setAction('Idle')
-              // }
-            }}
           >
-            <Box uid="followCamera" y={4} z={4} visible={true} boxVisible></Box>
+            <Box uid="followCamera" y={4} z={4} visible={false} boxVisible></Box>
           </Model>
         </Scene>
       </Container>

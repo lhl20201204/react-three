@@ -23,6 +23,7 @@ export class Stride { // 先通过代理proxy挂,后续改成继承
       this.distVec = Math.max(0, this.distVec - step);
       if (this.distVec === 0) {
         this.pw.wrap.position.copy(this.desVec3)
+        this.pw.props?.onLookAtPoint?.(this.desVec3)
       } else {
         this.pw.wrap.translateOnAxis(this.targetVecNorm, step);
       }
